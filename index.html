@@ -2,81 +2,208 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>Texify Pro - Math & LaTeX Processor</title>
+    <title>Texify Pro | Smart Content Automation Studio</title>
+    
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
     
     <style>
-        body { font-family: 'Inter', 'Segoe UI', Roboto, sans-serif; background-color: #f1f5f9; padding: 40px 20px; display: flex; justify-content: center; }
-        .container { background-color: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); width: 100%; max-width: 700px; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f1f5f9; padding: 30px; display: flex; justify-content: center; }
+        .container { background-color: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 100%; max-width: 720px; border-top: 5px solid #2563eb; }
         
-        /* Branding Header */
         .branding { text-align: center; margin-bottom: 25px; }
-        .branding h2 { color: #0f172a; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .branding p { color: #64748b; font-size: 14px; margin: 5px 0 0; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+        .branding h2 { color: #0f172a; margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -1px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .branding p { color: #64748b; font-size: 14px; margin: 5px 0 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
 
-        label { font-weight: 600; color: #334155; display: block; margin-top: 20px; margin-bottom: 8px; font-size: 13px; }
+        label { font-weight: 700; color: #334155; display: block; margin-top: 20px; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; }
         
-        textarea { width: 100%; height: 140px; padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 15px; font-family: 'Fira Code', monospace; resize: vertical; box-sizing: border-box; transition: all 0.2s; background: #fff; }
+        textarea { width: 100%; height: 140px; padding: 15px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 15px; font-family: 'Fira Code', 'Courier New', monospace; resize: vertical; box-sizing: border-box; transition: 0.2s; line-height: 1.5; background: #fff; }
         textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
         
-        /* Buttons */
         .btn-group { display: flex; gap: 12px; margin-top: 20px; }
-        .btn { color: white; border: none; padding: 12px 20px; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer; flex: 1; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-main { background-color: #2563eb; }
-        .btn-main:hover { background-color: #1d4ed8; }
-        .btn-clear { background-color: #f1f5f9; color: #64748b; flex: 0.3; }
-        .btn-clear:hover { background-color: #e2e8f0; color: #0f172a; }
+        .btn { color: white; border: none; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 8px; cursor: pointer; flex: 1; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-primary { background-color: #2563eb; }
+        .btn-primary:hover { background-color: #1d4ed8; }
+        .btn-danger { background-color: #ef4444; flex: 0.35; }
+        .btn-danger:hover { background-color: #dc2626; }
         
         .action-group { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-edit { background-color: #f59e0b; flex: 0.25; }
-        .btn-preview { background-color: #8b5cf6; flex: 0.3; }
-        .btn-copy { background-color: #10b981; flex: 0.45; }
+        .btn-warning { background-color: #f59e0b; flex: 0.25; }
+        .btn-warning:hover { background-color: #d97706; }
+        .btn-info { background-color: #8b5cf6; flex: 0.3; }
+        .btn-info:hover { background-color: #7c3aed; }
+        .copy-btn { background-color: #10b981; flex: 0.45; }
+        .copy-btn:hover { background-color: #059669; }
         
-        #outputBox { background-color: #f8fafc; color: #334155; font-weight: 600; }
+        #outputBox { background-color: #f8fafc; color: #1e293b; font-weight: bold; border: 1.5px solid #e2e8f0; }
         
-        #previewContainer { display: none; margin-top: 25px; padding: 20px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; }
-        .preview-header { font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        /* Preview Box Fix: Keeps spaces and renders correctly */
+        #previewContainer { display: none; margin-top: 25px; padding: 25px; background-color: #ffffff; border: 2px dashed #cbd5e1; border-radius: 12px; font-size: 18px; color: #0f172a; overflow-x: auto; line-height: 1.8; white-space: pre-wrap; }
+        .preview-header { font-size: 11px; color: #94a3b8; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; }
     </style>
+
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 
 <div class="container">
     <div class="branding">
         <h2>⚡ Texify Pro</h2>
-        <p>Advanced Math & LaTeX Processor</p>
+        <p>Smart Content Automation Studio</p>
     </div>
     
     <label>SOURCE CONTENT (Rich Text Input)</label>
     <textarea id="inputBox" placeholder="Paste content from Word/Mathpix here..."></textarea>
     
     <div class="btn-group">
-        <button class="btn btn-main" onclick="convertToLatex()">⚙️ Run Processor</button>
-        <button class="btn btn-clear" onclick="clearAll()">🗑️ Reset</button>
+        <button class="btn btn-primary" onclick="convertToLatex()">⚙️ Run Processor</button>
+        <button class="btn btn-danger" onclick="clearAll()">🗑️ Reset</button>
     </div>
     
-    <label>GENERATED SYNTAX (CMS Ready)</label>
+    <label>GENERATED SYNTAX (CMS READY)</label>
     <textarea id="outputBox" readonly></textarea>
     
     <div class="action-group">
-        <button class="btn btn-warning btn-edit" onclick="enableEdit()">✏️ Edit</button>
-        <button class="btn btn-info btn-preview" onclick="previewLatex()">👁️ Preview</button>
-        <button class="btn btn-copy" id="copyBtn" onclick="copyResult()">📋 Copy Output</button>
+        <button class="btn btn-warning btn" onclick="enableEdit()">✏️ Edit</button>
+        <button class="btn btn-info btn" onclick="previewLatex()">👁️ Preview</button>
+        <button class="btn copy-btn" id="copyBtn" onclick="copyResult()">📋 Copy Output</button>
     </div>
 
     <div id="previewContainer">
-        <div class="preview-header">Live Syntax Rendering</div>
+        <div class="preview-header">🔴 Live Syntax Rendering</div>
         <div id="previewContent"></div>
     </div>
 </div>
 
 <script>
-    // [আগের লজিক কোড এখানে থাকবে...]
     function convertToLatex() {
         let str = document.getElementById('inputBox').value;
-        // ... (বাকি লজিক একই থাকবে)
-        document.getElementById('outputBox').value = str; // উদাহরণের জন্য
+
+        // ০. ক্লিনিং ও ইউনিকোড সিম্বল ফিক্স
+        str = str.replace(/⟦/g, '\\llbracket ').replace(/⟧/g, '\\rrbracket ').replace(/\^\^/g, '^');
+
+        // ১. V-bar এবং Nu-bar স্পেশাল ফিক্স (Word Hidden Macron Characters)
+        str = str.replace(/v[\u0304\u0305]/g, '\\bar{v} ');
+        str = str.replace(/ν[\u0304\u0305]/g, '\\bar{\\nu} ');
+        str = str.replace(/ν/g, '\\nu ');
+        str = str.replace(/λ/g, '\\lambda ');
+
+        // ২. সাবস্ক্রিপ্ট ও পাওয়ার
+        str = str.replace(/_([a-zA-Z0-9]+)/g, '_{$1}').replace(/\^\(([^)]+)\)/g, '^{$1}').replace(/\^([a-zA-Z0-9]+)/g, '^{$1}');
+
+        // ৩. অ্যাডভান্সড ফ্র্যাকশন প্রসেসর
+        function processFractions(text) {
+            let i = 0, limit = 500;
+            while ((i = text.indexOf('/', i)) !== -1 && limit-- > 0) {
+                let leftStart = i - 1;
+                while (leftStart >= 0 && text[leftStart] === ' ') leftStart--;
+                let numStart = leftStart;
+                if (leftStart >= 0 && text[leftStart] === ')') {
+                    let openCount = 1; numStart--;
+                    while (numStart >= 0 && openCount > 0) {
+                        if (text[numStart] === ')') openCount++;
+                        if (text[numStart] === '(') openCount--;
+                        numStart--;
+                    }
+                    numStart++;
+                } else {
+                    while (numStart >= 0 && /[a-zA-Z0-9πθβα∞Δ^{}\\\._√\nu\lambda]/i.test(text[numStart])) numStart--;
+                    numStart++;
+                }
+                let rightStart = i + 1;
+                while (rightStart < text.length && text[rightStart] === ' ') rightStart++;
+                let denEnd = rightStart;
+                if (rightStart < text.length && text[rightStart] === '(') {
+                    let openCount = 1; denEnd++;
+                    while (denEnd < text.length && openCount > 0) {
+                        if (text[denEnd] === '(') openCount++;
+                        if (text[denEnd] === ')') openCount--;
+                        denEnd++;
+                    }
+                    denEnd--;
+                } else {
+                    while (denEnd < text.length && /[a-zA-Z0-9πθβα∞Δ^{}\\\._√\nu\lambda]/i.test(text[denEnd])) denEnd++;
+                    denEnd--;
+                }
+                let numerator = text.substring(numStart, leftStart + 1).replace(/^\((.*)\)$/, '$1');
+                let denominator = text.substring(rightStart, denEnd + 1).replace(/^\((.*)\)$/, '$1');
+                if (numerator && denominator) {
+                    let rep = "\\frac{" + numerator.trim() + "}{" + denominator.trim() + "}";
+                    text = text.substring(0, numStart) + rep + text.substring(denEnd + 1);
+                    i = 0;
+                } else i++;
+            }
+            return text;
+        }
+        str = processFractions(str);
+
+        // ৪. সিম্বলস
+        str = str.replace(/≤/g, '\\leq ').replace(/≥/g, '\\geq ').replace(/∴/g, '\\therefore ').replace(/±/g, '\\pm ');
+        str = str.replace(/π/g, '\\pi ').replace(/∞/g, '\\infty ').replace(/×/g, '\\times ').replace(/√/g, '\\sqrt');
+
+        // ৫. রুট অটো-ব্র্যাকেট
+        str = str.replace(/√/g, '\\sqrt');
+        let idx = 0;
+        while ((idx = str.indexOf('\\sqrt(', idx)) !== -1) {
+            let open = 1, j = idx + 6;
+            while (j < str.length && open > 0) {
+                if (str[j] === '(') open++; if (str[j] === ')') open--; j++;
+            }
+            if (open === 0) str = str.substring(0, idx + 5) + '{' + str.substring(idx + 6, j - 1) + '}' + str.substring(j);
+            else idx += 6;
+        }
+
+        // ৬. স্মার্ট লাইন স্প্লিটার এবং গ্যাপ ফিক্স (High-Fidelity)
+        let lines = str.split('\n');
+        let resultLines = [];
+        for (let line of lines) {
+            if (!line.trim()) { resultLines.push(""); continue; }
+            let parts = line.split(/([\s,।;:]*(?:[\u0980-\u09FF]+[\s,।;:]*)+|\s{2,})/);
+            let formattedLine = "";
+            for (let part of parts) {
+                if (!part) continue;
+                if (/[\u0980-\u09FF]/.test(part)) formattedLine += part;
+                else if (/^\s{2,}$/.test(part)) formattedLine += part; // গ্যাপগুলো অক্ষত রাখা
+                else formattedLine += (part.trim() ? "$" + part.trim() + "$" : part);
+            }
+            resultLines.push(formattedLine);
+        }
+        document.getElementById('outputBox').value = resultLines.join('\n');
     }
-    // ... (বাকি সব ফাংশন)
+
+    function enableEdit() { let b = document.getElementById('outputBox'); b.removeAttribute('readonly'); b.style.backgroundColor = "#fff"; b.focus(); }
+    
+    function previewLatex() {
+        let t = document.getElementById('outputBox').value;
+        let c = document.getElementById('previewContent');
+        
+        if (t.trim() === "") {
+            alert("⚠️ আগে Convert করুন বা বক্সে কিছু লিখুন!");
+            return;
+        }
+
+        // HTML গ্যাপ বজায় রাখতে একাধিক স্পেসকে &nbsp; দিয়ে রিপ্লেস করা
+        let cleanText = t.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        let spacedText = cleanText.replace(/  +/g, function(match) {
+            return '&nbsp;'.repeat(match.length);
+        });
+        
+        c.innerHTML = spacedText.replace(/\n/g, '<br>');
+        document.getElementById('previewContainer').style.display = "block";
+        MathJax.typesetPromise([c]);
+    }
+
+    function clearAll() { location.reload(); }
+    function copyResult() {
+        let b = document.getElementById('outputBox'); b.select(); document.execCommand("copy");
+        let btn = document.getElementById('copyBtn'); btn.innerHTML = "✅ Copied!";
+        setTimeout(() => { btn.innerHTML = "📋 Copy Output"; }, 2000);
+    }
 </script>
 </body>
 </html>
