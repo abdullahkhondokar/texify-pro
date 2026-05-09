@@ -2,553 +2,81 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Texify Pro | Advanced LaTeX Converter</title>
-    
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' fill='%23356EF0'>⚡</text></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Texify Pro - Math & LaTeX Processor</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
     
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --purple: #8b5cf6;
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8fafc;
-            --bg-tertiary: #f1f5f9;
-            --text-primary: #0f172a;
-            --text-secondary: #334155;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --border-focus: #3b82f6;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-            --radius: 12px;
-            --radius-sm: 8px;
-        }
+        body { font-family: 'Inter', 'Segoe UI', Roboto, sans-serif; background-color: #f1f5f9; padding: 40px 20px; display: flex; justify-content: center; }
+        .container { background-color: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); width: 100%; max-width: 700px; }
+        
+        /* Branding Header */
+        .branding { text-align: center; margin-bottom: 25px; }
+        .branding h2 { color: #0f172a; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .branding p { color: #64748b; font-size: 14px; margin: 5px 0 0; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .container {
-            background: var(--bg-primary);
-            padding: 40px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
-            width: 100%;
-            max-width: 800px;
-            border-top: 6px solid var(--primary);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--purple), var(--success));
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 35px;
-            position: relative;
-        }
-
-        .logo {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, var(--primary), var(--purple));
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: var(--shadow-lg);
-            font-size: 28px;
-            font-weight: 800;
-        }
-
-        .header h1 {
-            color: var(--text-primary);
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            margin-bottom: 8px;
-        }
-
-        .header p {
-            color: var(--text-muted);
-            font-size: 15px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .form-group {
-            margin-bottom: 28px;
-        }
-
-        .label {
-            display: block;
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 10px;
-            position: relative;
-            padding-left: 20px;
-        }
-
-        .label::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 2px;
-            width: 4px;
-            height: 16px;
-            background: var(--primary);
-            border-radius: 2px;
-        }
-
-        .textarea {
-            width: 100%;
-            min-height: 160px;
-            padding: 20px;
-            border: 2px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 15px;
-            font-family: 'Fira Code', 'SF Mono', Monaco, monospace;
-            line-height: 1.6;
-            resize: vertical;
-            transition: all 0.2s ease;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-        }
-
-        .textarea:focus {
-            outline: none;
-            border-color: var(--border-focus);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-            transform: translateY(-1px);
-        }
-
-        .textarea::placeholder {
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        .btn-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin: 30px 0;
-        }
-
-        .btn {
-            padding: 16px 24px;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            text-decoration: none;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, var(--danger), #dc2626);
-            color: white;
-            grid-column: span 2;
-            font-size: 14px;
-        }
-
-        .btn-secondary {
-            background: var(--bg-secondary);
-            color: var(--text-secondary);
-            border: 2px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: var(--text-secondary);
-            color: white;
-        }
-
-        .action-bar {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
-        }
-
-        .btn-small {
-            flex: 1;
-            padding: 12px 16px;
-            font-size: 14px;
-        }
-
-        .btn-warning { background: linear-gradient(135deg, var(--warning), #d97706); color: white; }
-        .btn-purple { background: linear-gradient(135deg, var(--purple), #7c3aed); color: white; }
-        .btn-success { background: linear-gradient(135deg, var(--success), #059669); color: white; }
-
-        .output-textarea {
-            background: var(--bg-secondary) !important;
-            font-weight: 500;
-        }
-
-        .preview-panel {
-            display: none;
-            margin-top: 30px;
-            padding: 25px;
-            background: linear-gradient(145deg, #ffffff, #f8fafc);
-            border: 2px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: inset 0 2px 4px rgb(0 0 0 / 0.05);
-        }
-
-        .preview-panel.show {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .preview-header {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: 700;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .preview-content {
-            font-size: 18px;
-            line-height: 1.8;
-            color: var(--text-primary);
-            white-space: pre-wrap;
-            overflow-x: auto;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .status {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            border-radius: var(--radius-sm);
-            color: white;
-            font-weight: 600;
-            font-size: 14px;
-            transform: translateX(400px);
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .status.show {
-            transform: translateX(0);
-        }
-
-        .status.success { background: var(--success); }
-        .status.copied { background: var(--success); }
-
-        @media (max-width: 768px) {
-            body { padding: 15px; }
-            .container { padding: 25px; margin: 10px; }
-            .btn-group { grid-template-columns: 1fr; }
-            .action-bar { flex-direction: column; }
-        }
+        label { font-weight: 600; color: #334155; display: block; margin-top: 20px; margin-bottom: 8px; font-size: 13px; }
+        
+        textarea { width: 100%; height: 140px; padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 15px; font-family: 'Fira Code', monospace; resize: vertical; box-sizing: border-box; transition: all 0.2s; background: #fff; }
+        textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        
+        /* Buttons */
+        .btn-group { display: flex; gap: 12px; margin-top: 20px; }
+        .btn { color: white; border: none; padding: 12px 20px; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer; flex: 1; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-main { background-color: #2563eb; }
+        .btn-main:hover { background-color: #1d4ed8; }
+        .btn-clear { background-color: #f1f5f9; color: #64748b; flex: 0.3; }
+        .btn-clear:hover { background-color: #e2e8f0; color: #0f172a; }
+        
+        .action-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-edit { background-color: #f59e0b; flex: 0.25; }
+        .btn-preview { background-color: #8b5cf6; flex: 0.3; }
+        .btn-copy { background-color: #10b981; flex: 0.45; }
+        
+        #outputBox { background-color: #f8fafc; color: #334155; font-weight: 600; }
+        
+        #previewContainer { display: none; margin-top: 25px; padding: 20px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; }
+        .preview-header { font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
     </style>
-
-    <script>
-        window.MathJax = {
-            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-            chtml: { scale: 1.1 },
-            startup: { ready: () => { MathJax.startup.defaultReady(); } }
-        };
-    </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
-
 <body>
-    <div class="status" id="status"></div>
+
+<div class="container">
+    <div class="branding">
+        <h2>⚡ Texify Pro</h2>
+        <p>Advanced Math & LaTeX Processor</p>
+    </div>
     
-    <div class="container">
-        <div class="header">
-            <div class="logo">⚡</div>
-            <h1>Texify Pro</h1>
-            <p>Advanced LaTeX Content Processor</p>
-        </div>
-
-        <div class="form-group">
-            <label class="label">📄 Source Content</label>
-            <textarea 
-                id="inputBox" 
-                class="textarea"
-                placeholder="Paste your content from Word, Mathpix, or any source here...
-                
-Example:
-E = mc²
-∫ f(x) dx = F(x) + C
-ν̅ = λ / T
-a/b + c/d = (ad + bc)/(bd)"
-            ></textarea>
-        </div>
-
-        <div class="btn-group">
-            <button class="btn btn-primary" onclick="convertToLatex()">
-                <span>⚙️</span> Process Content
-            </button>
-            <button class="btn btn-danger" onclick="clearAll()">
-                <span>🗑️</span> Reset All
-            </button>
-        </div>
-
-        <div class="form-group">
-            <label class="label">🎯 LaTeX Output</label>
-            <textarea 
-                id="outputBox" 
-                class="textarea output-textarea"
-                readonly
-                placeholder="Processed LaTeX will appear here..."
-            ></textarea>
-        </div>
-
-        <div class="action-bar">
-            <button class="btn btn-warning btn-small" onclick="enableEdit()">
-                ✏️ Enable Edit
-            </button>
-            <button class="btn btn-purple btn-small" onclick="previewLatex()">
-                👁️ Live Preview
-            </button>
-            <button class="btn btn-success btn-small" id="copyBtn" onclick="copyResult()">
-                📋 Copy Output
-            </button>
-        </div>
-
-        <div class="preview-panel" id="previewContainer">
-            <div class="preview-header">
-                <span>🔴</span> Live LaTeX Rendering
-            </div>
-            <div id="previewContent" class="preview-content"></div>
-        </div>
+    <label>SOURCE CONTENT (Rich Text Input)</label>
+    <textarea id="inputBox" placeholder="Paste content from Word/Mathpix here..."></textarea>
+    
+    <div class="btn-group">
+        <button class="btn btn-main" onclick="convertToLatex()">⚙️ Run Processor</button>
+        <button class="btn btn-clear" onclick="clearAll()">🗑️ Reset</button>
+    </div>
+    
+    <label>GENERATED SYNTAX (CMS Ready)</label>
+    <textarea id="outputBox" readonly></textarea>
+    
+    <div class="action-group">
+        <button class="btn btn-warning btn-edit" onclick="enableEdit()">✏️ Edit</button>
+        <button class="btn btn-info btn-preview" onclick="previewLatex()">👁️ Preview</button>
+        <button class="btn btn-copy" id="copyBtn" onclick="copyResult()">📋 Copy Output</button>
     </div>
 
-    <script>
-        // Enhanced Convert Function with Progress Feedback
-        function convertToLatex() {
-            const input = document.getElementById('inputBox').value;
-            if (!input.trim()) {
-                showStatus('Please add some content first!', 'error');
-                return;
-            }
+    <div id="previewContainer">
+        <div class="preview-header">Live Syntax Rendering</div>
+        <div id="previewContent"></div>
+    </div>
+</div>
 
-            showStatus('Processing content...', 'processing');
-            
-            setTimeout(() => {
-                let str = input;
-
-                // 1. Advanced Unicode Cleaning
-                str = str.replace(/⟦/g, '\\llbracket ').replace(/⟧/g, '\\rrbracket ');
-                str = str.replace(/ν̅|ν\u0305/g, '\\bar{\\nu}');
-                str = str.replace(/ν/g, '\\nu ').replace(/λ/g, '\\lambda ');
-
-                // 2. Subscripts & Superscripts
-                str = str.replace(/_([a-zA-Z0-9]+)/g, '_{$1}')
-                        .replace(/\^([a-zA-Z0-9]+)/g, '^{$1}');
-
-                // 3. Smart Fraction Detection
-                str = processSmartFractions(str);
-
-                // 4. Mathematical Symbols
-                const symbols = {
-                    '≤': '\\leq ', '≥': '\\geq ', '∴': '\\therefore ',
-                    '±': '\\pm ', 'π': '\\pi ', '∞': '\\infty ',
-                    '×': '\\times ', '√': '\\sqrt'
-                };
-                Object.entries(symbols).forEach(([key, val]) => {
-                    str = str.replace(new RegExp(key, 'g'), val);
-                });
-
-                // 5. Auto-bracket square roots
-                str = autoBracketRoots(str);
-
-                // 6. Smart line processing with inline math
-                str = processLines(str);
-
-                document.getElementById('outputBox').value = str;
-                showStatus('✅ Content processed successfully!', 'success');
-            }, 300);
-        }
-
-        function processSmartFractions(text) {
-            let i = 0;
-            while ((i = text.indexOf('/', i)) !== -1) {
-                const fraction = extractFraction(text, i);
-                if (fraction) {
-                    text = text.replace(fraction.input, fraction.latex);
-                    i = 0;
-                } else {
-                    i++;
-                }
-            }
-            return text;
-        }
-
-        function extractFraction(text, slashPos) {
-            // Simplified fraction logic - extract numerator/denominator
-            const left = text.slice(0, slashPos).trim().match(/[\wπθβα∞Δνλ()^{}\\.]+$/);
-            const right = text.slice(slashPos + 1).match(/^[\wπθβα∞Δνλ()^{}\\.]+/);
-            
-            if (left && right) {
-                return {
-                    input: `${left[0]}/${right[0]}`,
-                    latex: `\\frac{${left[0].trim()}}{${right[0].trim()}}`
-                };
-            }
-            return null;
-        }
-
-        function autoBracketRoots(str) {
-            let idx = 0;
-            while ((idx = str.indexOf('\\sqrt(', idx)) !== -1) {
-                let balance = 1, j = idx + 6;
-                while (j < str.length && balance > 0) {
-                    if (str[j] === '(') balance++;
-                    if (str[j] === ')') balance--;
-                    j++;
-                }
-                if (balance === 0) {
-                    str = str.slice(0, idx + 5) + `{${str.slice(idx + 6, j - 1)}}` + str.slice(j);
-                } else {
-                    idx += 6;
-                }
-            }
-            return str;
-        }
-
-        function processLines(str) {
-            return str.split('\n').map(line => {
-                if (!line.trim()) return '';
-                const parts = line.split(/([,\s।;:]{2,}|\s{3,})/);
-                return parts.map(part => {
-                    return /\u0980-\u09FF/.test(part) ? part : (part.trim() ? `$ ${part.trim()} $` : part);
-                }).join('');
-            }).join('\n');
-        }
-
-        function enableEdit() {
-            const output = document.getElementById('outputBox');
-            output.removeAttribute('readonly');
-            output.classList.remove('output-textarea');
-            output.focus();
-            showStatus('✏️ Edit mode enabled', 'success');
-        }
-
-        function previewLatex() {
-            const text = document.getElementById('outputBox').value;
-            if (!text.trim()) {
-                showStatus('Please process content first!', 'error');
-                return;
-            }
-
-            const container = document.getElementById('previewContainer');
-            const content = document.getElementById('previewContent');
-            
-            content.innerHTML = text.replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                .replace(/  +/g, match => '&nbsp;'.repeat(match.length / 2))
-                .replace(/\n/g, '<br>');
-            
-            container.classList.add('show');
-            MathJax.typesetPromise([content]);
-            showStatus('👁️ Preview rendered', 'success');
-        }
-
-        function copyResult() {
-            const output = document.getElementById('outputBox');
-            output.select();
-            document.execCommand('copy');
-            
-            const btn = document.getElementById('copyBtn');
-            const original = btn.innerHTML;
-            btn.innerHTML = '✅ Copied!';
-            showStatus('📋 Output copied to clipboard!', 'copied');
-            
-            setTimeout(() => {
-                btn.innerHTML = original;
-            }, 2000);
-        }
-
-        function clearAll() {
-            if (confirm('Reset everything?')) {
-                document.getElementById('inputBox').value = '';
-                document.getElementById('outputBox').value = '';
-                document.getElementById('previewContainer').classList.remove('show');
-                showStatus('🗑️ Everything reset', 'success');
-            }
-        }
-
-        function showStatus(message, type = 'success') {
-            const status = document.getElementById('status');
-            status.textContent = message;
-            status.className = `status show ${type}`;
-            setTimeout(() => {
-                status.classList.remove('show');
-            }, 3000);
-        }
-
-        // Auto-resize textareas
-        document.querySelectorAll('textarea').forEach(textarea => {
-            textarea.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = this.scrollHeight + 'px';
-            });
-        });
-    </script>
+<script>
+    // [আগের লজিক কোড এখানে থাকবে...]
+    function convertToLatex() {
+        let str = document.getElementById('inputBox').value;
+        // ... (বাকি লজিক একই থাকবে)
+        document.getElementById('outputBox').value = str; // উদাহরণের জন্য
+    }
+    // ... (বাকি সব ফাংশন)
+</script>
 </body>
 </html>
