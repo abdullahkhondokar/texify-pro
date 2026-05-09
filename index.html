@@ -2,201 +2,553 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>Texify Pro | Smart Content Automation Studio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texify Pro | Advanced LaTeX Converter</title>
     
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' fill='%23356EF0'>⚡</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f1f5f9; padding: 30px; display: flex; justify-content: center; }
-        .container { background-color: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 100%; max-width: 720px; border-top: 5px solid #2563eb; }
-        
-        .branding { text-align: center; margin-bottom: 25px; }
-        .branding h2 { color: #0f172a; margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -1px; display: flex; align-items: center; justify-content: center; gap: 12px; }
-        .branding p { color: #64748b; font-size: 14px; margin: 5px 0 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --purple: #8b5cf6;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --border-focus: #3b82f6;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
 
-        label { font-weight: 700; color: #334155; display: block; margin-top: 20px; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; }
-        
-        textarea { width: 100%; height: 140px; padding: 15px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 15px; font-family: 'Fira Code', 'Courier New', monospace; resize: vertical; box-sizing: border-box; transition: 0.2s; line-height: 1.5; background: #fff; }
-        textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
-        
-        .btn-group { display: flex; gap: 12px; margin-top: 20px; }
-        .btn { color: white; border: none; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 8px; cursor: pointer; flex: 1; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-primary { background-color: #2563eb; }
-        .btn-primary:hover { background-color: #1d4ed8; }
-        .btn-danger { background-color: #ef4444; flex: 0.35; }
-        .btn-danger:hover { background-color: #dc2626; }
-        
-        .action-group { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-warning { background-color: #f59e0b; flex: 0.25; }
-        .btn-warning:hover { background-color: #d97706; }
-        .btn-info { background-color: #8b5cf6; flex: 0.3; }
-        .btn-info:hover { background-color: #7c3aed; }
-        .copy-btn { background-color: #10b981; flex: 0.45; }
-        .copy-btn:hover { background-color: #059669; }
-        
-        #outputBox { background-color: #f8fafc; color: #1e293b; font-weight: bold; border: 1.5px solid #e2e8f0; }
-        
-        /* Preview Box Fix: Keeps spaces and renders correctly */
-        #previewContainer { display: none; margin-top: 25px; padding: 25px; background-color: #ffffff; border: 2px dashed #cbd5e1; border-radius: 12px; font-size: 18px; color: #0f172a; overflow-x: auto; line-height: 1.8; white-space: pre-wrap; }
-        .preview-header { font-size: 11px; color: #94a3b8; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: var(--bg-primary);
+            padding: 40px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 800px;
+            border-top: 6px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--purple), var(--success));
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+            position: relative;
+        }
+
+        .logo {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: var(--shadow-lg);
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .header h1 {
+            color: var(--text-primary);
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .form-group {
+            margin-bottom: 28px;
+        }
+
+        .label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .label::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 2px;
+            width: 4px;
+            height: 16px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .textarea {
+            width: 100%;
+            min-height: 160px;
+            padding: 20px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-family: 'Fira Code', 'SF Mono', Monaco, monospace;
+            line-height: 1.6;
+            resize: vertical;
+            transition: all 0.2s ease;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .textarea:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .textarea::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 30px 0;
+        }
+
+        .btn {
+            padding: 16px 24px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+            grid-column: span 2;
+            font-size: 14px;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--text-secondary);
+            color: white;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-small {
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+
+        .btn-warning { background: linear-gradient(135deg, var(--warning), #d97706); color: white; }
+        .btn-purple { background: linear-gradient(135deg, var(--purple), #7c3aed); color: white; }
+        .btn-success { background: linear-gradient(135deg, var(--success), #059669); color: white; }
+
+        .output-textarea {
+            background: var(--bg-secondary) !important;
+            font-weight: 500;
+        }
+
+        .preview-panel {
+            display: none;
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: inset 0 2px 4px rgb(0 0 0 / 0.05);
+        }
+
+        .preview-panel.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .preview-header {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .preview-content {
+            font-size: 18px;
+            line-height: 1.8;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            overflow-x: auto;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .status.show {
+            transform: translateX(0);
+        }
+
+        .status.success { background: var(--success); }
+        .status.copied { background: var(--success); }
+
+        @media (max-width: 768px) {
+            body { padding: 15px; }
+            .container { padding: 25px; margin: 10px; }
+            .btn-group { grid-template-columns: 1fr; }
+            .action-bar { flex-direction: column; }
+        }
     </style>
 
     <script>
         window.MathJax = {
-            tex: { inlineMath: [['$', '$']] },
-            svg: { fontCache: 'global' }
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            chtml: { scale: 1.1 },
+            startup: { ready: () => { MathJax.startup.defaultReady(); } }
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
+
 <body>
-
-<div class="container">
-    <div class="branding">
-        <h2>⚡ Texify Pro</h2>
-        <p>Smart Content Automation Studio</p>
-    </div>
+    <div class="status" id="status"></div>
     
-    <label>SOURCE CONTENT (Rich Text Input)</label>
-    <textarea id="inputBox" placeholder="Paste content from Word/Mathpix here..."></textarea>
-    
-    <div class="btn-group">
-        <button class="btn btn-primary" onclick="convertToLatex()">⚙️ Run Processor</button>
-        <button class="btn btn-danger" onclick="clearAll()">🗑️ Reset</button>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚡</div>
+            <h1>Texify Pro</h1>
+            <p>Advanced LaTeX Content Processor</p>
+        </div>
+
+        <div class="form-group">
+            <label class="label">📄 Source Content</label>
+            <textarea 
+                id="inputBox" 
+                class="textarea"
+                placeholder="Paste your content from Word, Mathpix, or any source here...
+                
+Example:
+E = mc²
+∫ f(x) dx = F(x) + C
+ν̅ = λ / T
+a/b + c/d = (ad + bc)/(bd)"
+            ></textarea>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="convertToLatex()">
+                <span>⚙️</span> Process Content
+            </button>
+            <button class="btn btn-danger" onclick="clearAll()">
+                <span>🗑️</span> Reset All
+            </button>
+        </div>
+
+        <div class="form-group">
+            <label class="label">🎯 LaTeX Output</label>
+            <textarea 
+                id="outputBox" 
+                class="textarea output-textarea"
+                readonly
+                placeholder="Processed LaTeX will appear here..."
+            ></textarea>
+        </div>
+
+        <div class="action-bar">
+            <button class="btn btn-warning btn-small" onclick="enableEdit()">
+                ✏️ Enable Edit
+            </button>
+            <button class="btn btn-purple btn-small" onclick="previewLatex()">
+                👁️ Live Preview
+            </button>
+            <button class="btn btn-success btn-small" id="copyBtn" onclick="copyResult()">
+                📋 Copy Output
+            </button>
+        </div>
+
+        <div class="preview-panel" id="previewContainer">
+            <div class="preview-header">
+                <span>🔴</span> Live LaTeX Rendering
+            </div>
+            <div id="previewContent" class="preview-content"></div>
+        </div>
     </div>
-    
-    <label>GENERATED SYNTAX (CMS READY)</label>
-    <textarea id="outputBox" readonly></textarea>
-    
-    <div class="action-group">
-        <button class="btn btn-warning btn" onclick="enableEdit()">✏️ Edit</button>
-        <button class="btn btn-info btn" onclick="previewLatex()">👁️ Preview</button>
-        <button class="btn copy-btn" id="copyBtn" onclick="copyResult()">📋 Copy Output</button>
-    </div>
 
-    <div id="previewContainer">
-        <div class="preview-header">🔴 Live Syntax Rendering</div>
-        <div id="previewContent"></div>
-    </div>
-</div>
+    <script>
+        // Enhanced Convert Function with Progress Feedback
+        function convertToLatex() {
+            const input = document.getElementById('inputBox').value;
+            if (!input.trim()) {
+                showStatus('Please add some content first!', 'error');
+                return;
+            }
 
-<script>
-    function convertToLatex() {
-        let str = document.getElementById('inputBox').value;
+            showStatus('Processing content...', 'processing');
+            
+            setTimeout(() => {
+                let str = input;
 
-        // ০. ক্লিনিং ও ইউনিকোড সিম্বল ফিক্স
-        str = str.replace(/⟦/g, '\\llbracket ').replace(/⟧/g, '\\rrbracket ').replace(/\^\^/g, '^');
+                // 1. Advanced Unicode Cleaning
+                str = str.replace(/⟦/g, '\\llbracket ').replace(/⟧/g, '\\rrbracket ');
+                str = str.replace(/ν̅|ν\u0305/g, '\\bar{\\nu}');
+                str = str.replace(/ν/g, '\\nu ').replace(/λ/g, '\\lambda ');
 
-        // ১. গ্রীক সিম্বল ও ফিজিক্স স্পেশাল (Nu-bar Fix)
-        // তরঙ্গ সংখ্যা ν̅ এর জন্য স্পেশাল লজিক
-        str = str.replace(/ν̅|ν\u0305/g, '\\bar{\\nu} '); 
-        str = str.replace(/ν/g, '\\nu ');
-        str = str.replace(/λ/g, '\\lambda ');
+                // 2. Subscripts & Superscripts
+                str = str.replace(/_([a-zA-Z0-9]+)/g, '_{$1}')
+                        .replace(/\^([a-zA-Z0-9]+)/g, '^{$1}');
 
-        // ২. সাবস্ক্রিপ্ট ও পাওয়ার
-        str = str.replace(/_([a-zA-Z0-9]+)/g, '_{$1}').replace(/\^\(([^)]+)\)/g, '^{$1}').replace(/\^([a-zA-Z0-9]+)/g, '^{$1}');
+                // 3. Smart Fraction Detection
+                str = processSmartFractions(str);
 
-        // ৩. অ্যাডভান্সড ফ্র্যাকশন প্রসেসর
-        function processFractions(text) {
-            let i = 0, limit = 500;
-            while ((i = text.indexOf('/', i)) !== -1 && limit-- > 0) {
-                let leftStart = i - 1;
-                while (leftStart >= 0 && text[leftStart] === ' ') leftStart--;
-                let numStart = leftStart;
-                if (leftStart >= 0 && text[leftStart] === ')') {
-                    let openCount = 1; numStart--;
-                    while (numStart >= 0 && openCount > 0) {
-                        if (text[numStart] === ')') openCount++;
-                        if (text[numStart] === '(') openCount--;
-                        numStart--;
-                    }
-                    numStart++;
-                } else {
-                    while (numStart >= 0 && /[a-zA-Z0-9πθβα∞Δ^{}\\\._√\nu\lambda]/i.test(text[numStart])) numStart--;
-                    numStart++;
-                }
-                let rightStart = i + 1;
-                while (rightStart < text.length && text[rightStart] === ' ') rightStart++;
-                let denEnd = rightStart;
-                if (rightStart < text.length && text[rightStart] === '(') {
-                    let openCount = 1; denEnd++;
-                    while (denEnd < text.length && openCount > 0) {
-                        if (text[denEnd] === '(') openCount++;
-                        if (text[denEnd] === ')') openCount--;
-                        denEnd++;
-                    }
-                    denEnd--;
-                } else {
-                    while (denEnd < text.length && /[a-zA-Z0-9πθβα∞Δ^{}\\\._√\nu\lambda]/i.test(text[denEnd])) denEnd++;
-                    denEnd--;
-                }
-                let numerator = text.substring(numStart, leftStart + 1).replace(/^\((.*)\)$/, '$1');
-                let denominator = text.substring(rightStart, denEnd + 1).replace(/^\((.*)\)$/, '$1');
-                if (numerator && denominator) {
-                    let rep = "\\frac{" + numerator.trim() + "}{" + denominator.trim() + "}";
-                    text = text.substring(0, numStart) + rep + text.substring(denEnd + 1);
+                // 4. Mathematical Symbols
+                const symbols = {
+                    '≤': '\\leq ', '≥': '\\geq ', '∴': '\\therefore ',
+                    '±': '\\pm ', 'π': '\\pi ', '∞': '\\infty ',
+                    '×': '\\times ', '√': '\\sqrt'
+                };
+                Object.entries(symbols).forEach(([key, val]) => {
+                    str = str.replace(new RegExp(key, 'g'), val);
+                });
+
+                // 5. Auto-bracket square roots
+                str = autoBracketRoots(str);
+
+                // 6. Smart line processing with inline math
+                str = processLines(str);
+
+                document.getElementById('outputBox').value = str;
+                showStatus('✅ Content processed successfully!', 'success');
+            }, 300);
+        }
+
+        function processSmartFractions(text) {
+            let i = 0;
+            while ((i = text.indexOf('/', i)) !== -1) {
+                const fraction = extractFraction(text, i);
+                if (fraction) {
+                    text = text.replace(fraction.input, fraction.latex);
                     i = 0;
-                } else i++;
+                } else {
+                    i++;
+                }
             }
             return text;
         }
-        str = processFractions(str);
 
-        // ৪. সিম্বলস
-        str = str.replace(/≤/g, '\\leq ').replace(/≥/g, '\\geq ').replace(/∴/g, '\\therefore ').replace(/±/g, '\\pm ');
-        str = str.replace(/π/g, '\\pi ').replace(/∞/g, '\\infty ').replace(/×/g, '\\times ').replace(/√/g, '\\sqrt');
-
-        // ৫. রুট অটো-ব্র্যাকেট
-        str = str.replace(/√/g, '\\sqrt');
-        let idx = 0;
-        while ((idx = str.indexOf('\\sqrt(', idx)) !== -1) {
-            let open = 1, j = idx + 6;
-            while (j < str.length && open > 0) {
-                if (str[j] === '(') open++; if (str[j] === ')') open--; j++;
+        function extractFraction(text, slashPos) {
+            // Simplified fraction logic - extract numerator/denominator
+            const left = text.slice(0, slashPos).trim().match(/[\wπθβα∞Δνλ()^{}\\.]+$/);
+            const right = text.slice(slashPos + 1).match(/^[\wπθβα∞Δνλ()^{}\\.]+/);
+            
+            if (left && right) {
+                return {
+                    input: `${left[0]}/${right[0]}`,
+                    latex: `\\frac{${left[0].trim()}}{${right[0].trim()}}`
+                };
             }
-            if (open === 0) str = str.substring(0, idx + 5) + '{' + str.substring(idx + 6, j - 1) + '}' + str.substring(j);
-            else idx += 6;
+            return null;
         }
 
-        // ৬. স্মার্ট লাইন স্প্লিটার এবং গ্যাপ ফিক্স (High-Fidelity)
-        let lines = str.split('\n');
-        let resultLines = [];
-        for (let line of lines) {
-            if (!line.trim()) { resultLines.push(""); continue; }
-            let parts = line.split(/([\s,।;:]*(?:[\u0980-\u09FF]+[\s,।;:]*)+|\s{2,})/);
-            let formattedLine = "";
-            for (let part of parts) {
-                if (!part) continue;
-                if (/[\u0980-\u09FF]/.test(part)) formattedLine += part;
-                else if (/^\s{2,}$/.test(part)) formattedLine += part; // গ্যাপগুলো অক্ষত রাখা
-                else formattedLine += (part.trim() ? "$" + part.trim() + "$" : part);
+        function autoBracketRoots(str) {
+            let idx = 0;
+            while ((idx = str.indexOf('\\sqrt(', idx)) !== -1) {
+                let balance = 1, j = idx + 6;
+                while (j < str.length && balance > 0) {
+                    if (str[j] === '(') balance++;
+                    if (str[j] === ')') balance--;
+                    j++;
+                }
+                if (balance === 0) {
+                    str = str.slice(0, idx + 5) + `{${str.slice(idx + 6, j - 1)}}` + str.slice(j);
+                } else {
+                    idx += 6;
+                }
             }
-            resultLines.push(formattedLine);
+            return str;
         }
-        document.getElementById('outputBox').value = resultLines.join('\n');
-    }
 
-    function enableEdit() { let b = document.getElementById('outputBox'); b.removeAttribute('readonly'); b.style.backgroundColor = "#fff"; b.focus(); }
-    
-    function previewLatex() {
-        let t = document.getElementById('outputBox').value;
-        let c = document.getElementById('previewContent');
-        // HTML গ্যাপ বজায় রাখতে একাধিক স্পেসকে &nbsp; দিয়ে রিপ্লেস করা
-        let cleanText = t.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        let spacedText = cleanText.replace(/  +/g, function(match) {
-            return '&nbsp;'.repeat(match.length);
+        function processLines(str) {
+            return str.split('\n').map(line => {
+                if (!line.trim()) return '';
+                const parts = line.split(/([,\s।;:]{2,}|\s{3,})/);
+                return parts.map(part => {
+                    return /\u0980-\u09FF/.test(part) ? part : (part.trim() ? `$ ${part.trim()} $` : part);
+                }).join('');
+            }).join('\n');
+        }
+
+        function enableEdit() {
+            const output = document.getElementById('outputBox');
+            output.removeAttribute('readonly');
+            output.classList.remove('output-textarea');
+            output.focus();
+            showStatus('✏️ Edit mode enabled', 'success');
+        }
+
+        function previewLatex() {
+            const text = document.getElementById('outputBox').value;
+            if (!text.trim()) {
+                showStatus('Please process content first!', 'error');
+                return;
+            }
+
+            const container = document.getElementById('previewContainer');
+            const content = document.getElementById('previewContent');
+            
+            content.innerHTML = text.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/  +/g, match => '&nbsp;'.repeat(match.length / 2))
+                .replace(/\n/g, '<br>');
+            
+            container.classList.add('show');
+            MathJax.typesetPromise([content]);
+            showStatus('👁️ Preview rendered', 'success');
+        }
+
+        function copyResult() {
+            const output = document.getElementById('outputBox');
+            output.select();
+            document.execCommand('copy');
+            
+            const btn = document.getElementById('copyBtn');
+            const original = btn.innerHTML;
+            btn.innerHTML = '✅ Copied!';
+            showStatus('📋 Output copied to clipboard!', 'copied');
+            
+            setTimeout(() => {
+                btn.innerHTML = original;
+            }, 2000);
+        }
+
+        function clearAll() {
+            if (confirm('Reset everything?')) {
+                document.getElementById('inputBox').value = '';
+                document.getElementById('outputBox').value = '';
+                document.getElementById('previewContainer').classList.remove('show');
+                showStatus('🗑️ Everything reset', 'success');
+            }
+        }
+
+        function showStatus(message, type = 'success') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status show ${type}`;
+            setTimeout(() => {
+                status.classList.remove('show');
+            }, 3000);
+        }
+
+        // Auto-resize textareas
+        document.querySelectorAll('textarea').forEach(textarea => {
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+            });
         });
-        c.innerHTML = spacedText.replace(/\n/g, '<br>');
-        document.getElementById('previewContainer').style.display = "block";
-        MathJax.typesetPromise([c]);
-    }
-
-    function clearAll() { location.reload(); }
-    function copyResult() {
-        let b = document.getElementById('outputBox'); b.select(); document.execCommand("copy");
-        let btn = document.getElementById('copyBtn'); btn.innerHTML = "✅ Copied!";
-        setTimeout(() => { btn.innerHTML = "📋 Copy Output"; }, 2000);
-    }
-</script>
+    </script>
 </body>
 </html>
