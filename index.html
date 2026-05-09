@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <title>Texify Pro - Math to LaTeX Studio</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; padding: 20px; display: flex; justify-content: center; }
+        .container { background-color: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 650px; }
+        h2 { color: #1e40af; text-align: center; margin-top: 0; font-weight: 800; letter-spacing: -0.5px; }
+        .subtitle { text-align: center; color: #64748b; font-size: 14px; margin-top: -15px; margin-bottom: 20px; font-weight: 500; }
+        label { font-weight: bold; color: #475569; display: block; margin-top: 15px; margin-bottom: 5px; font-size: 14px; }
+        textarea { width: 100%; height: 130px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; font-family: monospace; resize: vertical; box-sizing: border-box; transition: 0.3s; line-height: 1.4; }
+        textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        
+        .button-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { color: white; border: none; padding: 12px; font-size: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; flex: 1; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background-color: #2563eb; }
+        .btn-primary:hover { background-color: #1d4ed8; }
+        .btn-danger { background-color: #ef4444; flex: 0.4; }
+        .btn-danger:hover { background-color: #dc2626; }
+        
+        .action-group { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-warning { background-color: #f59e0b; color: white; flex: 0.25; }
+        .btn-warning:hover { background-color: #d97706; }
+        .btn-info { background-color: #8b5cf6; color: white; flex: 0.3; }
+        .btn-info:hover { background-color: #7c3aed; }
+        .copy-btn { background-color: #10b981; flex: 0.45; }
+        .copy-btn:hover { background-color: #059669; }
+        
+        #outputBox { background-color: #f8fafc; color: #0f172a; font-weight: bold; border: 1px solid #e2e8f0; }
+        
+        /* Preview Box Styling */
+        #previewContainer { display: none; margin-top: 20px; padding: 20px; background-color: #ffffff; border: 2px dashed #cbd5e1; border-radius: 8px; min-height: 50px; font-size: 16px; color: #1e293b; overflow-x: auto; line-height: 1.6; }
+        .preview-title { font-size: 12px; color: #64748b; font-weight: 800; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 6px; }
+    </style>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h2>⚡ Texify Pro</h2>
+    <div class="subtitle">Offline Math ➔ LaTeX Studio</div>
+    
+    <label>Normal Text (Word থেকে কপি করে এখানে দিন):</label>
+    <textarea id="inputBox" placeholder="যেমন: -3≤2x<8 বা, 4/3 < x < 14/3"></textarea>
+    
+    <div class="button-group">
+        <button class="btn btn-primary" onclick="convertToLatex()">⚙️ Convert to LaTeX</button>
+        <button class="btn btn-danger" onclick="clearAll()">🗑️ Clear All</button>
+    </div>
+    
+    <label>LaTeX Output (CMS এ পেস্ট করার জন্য):</label>
+    <textarea id="outputBox" readonly></textarea>
+    
+    <div class="action-group">
+        <button class="btn btn-warning" onclick="enableEdit()">✏️ Edit</button>
+        <button class="btn btn-info" onclick="previewLatex()">👁️ Preview</button>
+        <button class="btn copy-btn" id="copyBtn" onclick="copyResult()">📋 Copy LaTeX</button>
+    </div>
+
+    <div id="previewContainer">
+        <div class="preview-title">🔴 Live Render Preview</div>
+        <div id="previewContent"></div>
+    </div>
+</div>
+
+<script>
+    function convertToLatex() {
+        let fullText = document.getElementById('inputBox').value;
+        let str = fullText;
+
+        let outBox = document.getElementById('outputBox');
+        outBox.setAttribute('readonly', true);
+        outBox.style.backgroundColor = "#f8fafc";
+        outBox.style.border = "1px solid #e2e8f0";
+
+        str = str.replace(/⟦/g, '');
+        str = str.replace(/⟧/g, '');
+
+        str = str.replace(/\^\(([^)]+)\)/g, '^{$1}'); 
+        str = str.replace(/\^([a-zA-Z0-9]+)/g, '^{$1}'); 
+
+        function processFractions(text) {
+            function stripOuterBrackets(s) {
+                s = s.trim();
+                if (s.startsWith('(') && s.endsWith(')')) {
+                    let openCount = 0;
+                    for (let idx = 0; idx < s.length - 1; idx++) {
+                        if (s[idx] === '(') openCount++;
+                        if (s[idx] === ')') openCount--;
+                        if (openCount === 0) return s; 
+                    }
+                    if (openCount === 1 && s[s.length - 1] === ')') {
+                        return s.substring(1, s.length - 1);
+                    }
+                }
+                return s;
+            }
+
+            let i = 0;
+            let limit = 500; 
+            while ((i = text.indexOf('/', i)) !== -1 && limit-- > 0) {
+                let leftStart = i - 1;
+                while (leftStart >= 0 && text[leftStart] === ' ') leftStart--;
+
+                let numStart = leftStart;
+
+                if (leftStart >= 0 && text[leftStart] === ')') {
+                    let keepScanning = true;
+                    while (keepScanning && numStart >= 0) {
+                        let tempStart = numStart;
+                        while (tempStart >= 0 && text[tempStart] === ' ') tempStart--;
+                        if (tempStart >= 0 && text[tempStart] === ')') {
+                            let closeCount = 1;
+                            tempStart--;
+                            while (tempStart >= 0 && closeCount > 0) {
+                                if (text[tempStart] === ')') closeCount++;
+                                if (text[tempStart] === '(') closeCount--;
+                                tempStart--;
+                            }
+                            numStart = tempStart; 
+                        } else {
+                            keepScanning = false;
+                        }
+                    }
+                    numStart++; 
+                } else {
+                    while (numStart >= 0 && /[a-zA-Z0-9πθβα∞Δ^{}\\\._√]/i.test(text[numStart])) { 
+                        numStart--;
+                    }
+                    numStart++;
+                }
+
+                let numerator = text.substring(numStart, leftStart + 1);
+
+                let rightStart = i + 1;
+                while (rightStart < text.length && text[rightStart] === ' ') rightStart++;
+
+                let denEnd = rightStart;
+
+                if (rightStart < text.length && text[rightStart] === '(') {
+                    let keepScanning = true;
+                    while (keepScanning && denEnd < text.length) {
+                        let tempEnd = denEnd;
+                        while (tempEnd < text.length && text[tempEnd] === ' ') tempEnd++;
+                        if (tempEnd < text.length && text[tempEnd] === '(') {
+                            let openCount = 1;
+                            tempEnd++;
+                            while (tempEnd < text.length && openCount > 0) {
+                                if (text[tempEnd] === '(') openCount++;
+                                if (text[tempEnd] === ')') openCount--;
+                                tempEnd++;
+                            }
+                            denEnd = tempEnd; 
+                        } else {
+                            keepScanning = false;
+                        }
+                    }
+                    denEnd--; 
+                } else {
+                    while (denEnd < text.length && /[a-zA-Z0-9πθβα∞Δ^{}\\\._√]/i.test(text[denEnd])) {
+                        denEnd++;
+                    }
+                    denEnd--;
+                }
+
+                let denominator = text.substring(rightStart, denEnd + 1);
+
+                if (numerator && denominator) {
+                    let cleanNum = stripOuterBrackets(numerator);
+                    let cleanDen = stripOuterBrackets(denominator);
+                    let replacement = "\\frac{" + cleanNum + "}{" + cleanDen + "}";
+                    text = text.substring(0, numStart) + replacement + text.substring(denEnd + 1);
+                    i = 0; 
+                } else {
+                    i++;
+                }
+            }
+            return text;
+        }
+
+        str = processFractions(str);
+
+        str = str.replace(/≤/g, '\\leq ');
+        str = str.replace(/≥/g, '\\geq ');
+        str = str.replace(/\\Delta/gi, 'Δ');
+        str = str.replace(/∆/g, 'Δ');
+        str = str.replace(/\\rightleftharpoons/gi, '⇌');
+        str = str.replace(/\\leftrightharpoons/gi, '⇌');
+        str = str.replace(/∴/g, '\\therefore ');
+        str = str.replace(/∵/g, '\\because ');
+        str = str.replace(/±/g, '\\pm ');
+
+        str = str.replace(/α/g, '\\alpha ');
+        str = str.replace(/β/g, '\\beta ');
+        str = str.replace(/θ/g, '\\theta ');
+        str = str.replace(/π/g, '\\pi ');
+        str = str.replace(/∞/g, '\\infty ');
+        str = str.replace(/⋯/g, '\\cdots '); 
+        str = str.replace(/×/g, '\\times ');
+        str = str.replace(/÷/g, '\\div ');
+        str = str.replace(/\s+\.\s+/g, ' \\cdot ');
+
+        str = str.replace(/√/g, '\\sqrt');
+        let i = 0;
+        while ((i = str.indexOf('\\sqrt(', i)) !== -1) {
+            let openCount = 1;
+            let j = i + 6;
+            while (j < str.length && openCount > 0) {
+                if (str[j] === '(') openCount++;
+                if (str[j] === ')') openCount--;
+                j++;
+            }
+            if (openCount === 0) {
+                str = str.substring(0, i + 5) + '{' + str.substring(i + 6, j - 1) + '}' + str.substring(j);
+            } else {
+                i += 6;
+            }
+        }
+
+        let lines = str.split('\n');
+        let resultLines = [];
+
+        for (let idx = 0; idx < lines.length; idx++) {
+            let line = lines[idx];
+            if (line.trim() === "") {
+                resultLines.push("");
+                continue;
+            }
+
+            let parts = line.split(/([\s,।;:]*(?:[\u0980-\u09FF]+[\s,।;:]*)+)/);
+            let formattedLine = "";
+
+            for (let j = 0; j < parts.length; j++) {
+                let part = parts[j];
+                if (part === "") continue;
+
+                if (/[\u0980-\u09FF]/.test(part)) {
+                    formattedLine += part;
+                } else {
+                    if (part.trim() !== "") {
+                        let match = part.match(/^(\s*)(.*?)(\s*)$/);
+                        if (match) {
+                            formattedLine += match[1] + "$" + match[2] + "$" + match[3];
+                        } else {
+                            formattedLine += "$" + part + "$";
+                        }
+                    } else {
+                        formattedLine += part; 
+                    }
+                }
+            }
+            resultLines.push(formattedLine);
+        }
+
+        outBox.value = resultLines.join('\n');
+        document.getElementById('previewContainer').style.display = "none";
+    }
+
+    function enableEdit() {
+        let outBox = document.getElementById('outputBox');
+        outBox.removeAttribute('readonly');
+        outBox.style.backgroundColor = "#ffffff";
+        outBox.style.border = "2px solid #3b82f6";
+        outBox.focus();
+    }
+
+    // 🌟 প্রিভিউ ফিক্স: HTML ট্যাগ কনফ্লিক্ট এড়াতে < এবং > কে এস্কেপ করা হয়েছে 🌟
+    function previewLatex() {
+        let outBoxText = document.getElementById('outputBox').value;
+        let previewContainer = document.getElementById('previewContainer');
+        let previewContent = document.getElementById('previewContent');
+
+        if (outBoxText.trim() === "") {
+            alert("⚠️ আগে Convert করুন বা বক্সে কিছু লিখুন!");
+            return;
+        }
+
+        // ব্রাউজার যাতে < এবং > কে HTML ট্যাগ মনে না করে, তার জন্য এগুলোকে এনটিটিতে কনভার্ট করা
+        let safeText = outBoxText.replace(/&/g, "&amp;")
+                                 .replace(/</g, "&lt;")
+                                 .replace(/>/g, "&gt;");
+
+        // লাইন ব্রেক ঠিক করা
+        let htmlFormat = safeText.replace(/\n/g, '<br>');
+        previewContent.innerHTML = htmlFormat;
+        previewContainer.style.display = "block";
+
+        if (window.MathJax) {
+            MathJax.typesetPromise([previewContent]).catch(function (err) {
+                console.log(err.message);
+            });
+        } else {
+            previewContent.innerHTML = "<span style='color:red;'>⚠️ MathJax লোড হয়নি। আপনার ইন্টারনেট কানেকশন চেক করুন!</span>";
+        }
+    }
+
+    function clearAll() {
+        document.getElementById('inputBox').value = "";
+        let outBox = document.getElementById('outputBox');
+        outBox.value = "";
+        outBox.setAttribute('readonly', true);
+        outBox.style.backgroundColor = "#f8fafc";
+        outBox.style.border = "1px solid #e2e8f0";
+        
+        document.getElementById('previewContainer').style.display = "none";
+        document.getElementById('previewContent').innerHTML = "";
+        
+        let copyBtn = document.getElementById('copyBtn');
+        copyBtn.innerHTML = "📋 Copy LaTeX";
+        copyBtn.style.backgroundColor = "#10b981";
+        document.getElementById('inputBox').focus();
+    }
+
+    function copyResult() {
+        let copyText = document.getElementById("outputBox");
+        if(copyText.value === "") return;
+        copyText.select();
+        document.execCommand("copy");
+        
+        let btn = document.getElementById("copyBtn");
+        btn.innerHTML = "✅ Copied!";
+        btn.style.backgroundColor = "#059669";
+        setTimeout(() => { 
+            btn.innerHTML = "📋 Copy LaTeX"; 
+            btn.style.backgroundColor = "#10b981";
+        }, 2000);
+    }
+</script>
+
+</body>
+</html>
