@@ -2,47 +2,48 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>Texify Pro - Equation Syntax & Data Formatter</title>
+    <title>Texify Pro | Smart Content Automation Studio</title>
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
     
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; padding: 20px; display: flex; justify-content: center; }
-        .container { background-color: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 650px; }
-        h2 { color: #1e40af; text-align: center; margin-top: 0; font-weight: 800; letter-spacing: -0.5px; }
-        .subtitle { text-align: center; color: #64748b; font-size: 14px; margin-top: -15px; margin-bottom: 20px; font-weight: 500; }
-        label { font-weight: bold; color: #475569; display: block; margin-top: 15px; margin-bottom: 5px; font-size: 14px; }
-        textarea { width: 100%; height: 130px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; font-family: monospace; resize: vertical; box-sizing: border-box; transition: 0.3s; line-height: 1.4; }
-        textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f1f5f9; padding: 30px; display: flex; justify-content: center; }
+        .container { background-color: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 100%; max-width: 720px; border-top: 5px solid #2563eb; }
         
-        .button-group { display: flex; gap: 10px; margin-top: 15px; }
-        .btn { color: white; border: none; padding: 12px; font-size: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; flex: 1; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .branding { text-align: center; margin-bottom: 25px; }
+        .branding h2 { color: #0f172a; margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -1px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .branding p { color: #64748b; font-size: 14px; margin: 5px 0 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+        label { font-weight: 700; color: #334155; display: block; margin-top: 20px; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; }
+        
+        textarea { width: 100%; height: 140px; padding: 15px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 15px; font-family: 'Fira Code', 'Courier New', monospace; resize: vertical; box-sizing: border-box; transition: 0.2s; line-height: 1.5; background: #fff; }
+        textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        
+        .btn-group { display: flex; gap: 12px; margin-top: 20px; }
+        .btn { color: white; border: none; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 8px; cursor: pointer; flex: 1; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-primary { background-color: #2563eb; }
         .btn-primary:hover { background-color: #1d4ed8; }
-        .btn-danger { background-color: #ef4444; flex: 0.4; }
+        .btn-danger { background-color: #ef4444; flex: 0.35; }
         .btn-danger:hover { background-color: #dc2626; }
         
-        .action-group { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-warning { background-color: #f59e0b; color: white; flex: 0.25; }
+        .action-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-warning { background-color: #f59e0b; flex: 0.25; }
         .btn-warning:hover { background-color: #d97706; }
-        .btn-info { background-color: #8b5cf6; color: white; flex: 0.3; }
+        .btn-info { background-color: #8b5cf6; flex: 0.3; }
         .btn-info:hover { background-color: #7c3aed; }
         .copy-btn { background-color: #10b981; flex: 0.45; }
         .copy-btn:hover { background-color: #059669; }
         
-        #outputBox { background-color: #f8fafc; color: #0f172a; font-weight: bold; border: 1px solid #e2e8f0; }
+        #outputBox { background-color: #f8fafc; color: #1e293b; font-weight: bold; border: 1.5px solid #e2e8f0; }
         
-        /* Preview Box Styling: Added white-space: pre-wrap to keep spaces intact */
-        #previewContainer { display: none; margin-top: 20px; padding: 20px; background-color: #ffffff; border: 2px dashed #cbd5e1; border-radius: 8px; min-height: 50px; font-size: 16px; color: #1e293b; overflow-x: auto; line-height: 1.6; white-space: pre-wrap; }
-        .preview-title { font-size: 12px; color: #64748b; font-weight: 800; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 6px; }
+        /* Preview Box Fix: Keeps spaces and renders correctly */
+        #previewContainer { display: none; margin-top: 25px; padding: 25px; background-color: #ffffff; border: 2px dashed #cbd5e1; border-radius: 12px; font-size: 18px; color: #0f172a; overflow-x: auto; line-height: 1.8; white-space: pre-wrap; }
+        .preview-header { font-size: 11px; color: #94a3b8; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; }
     </style>
 
     <script>
         window.MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$'], ['\\[', '\\]']]
-            },
+            tex: { inlineMath: [['$', '$']] },
             svg: { fontCache: 'global' }
         };
     </script>
@@ -51,304 +52,151 @@
 <body>
 
 <div class="container">
-    <h2>⚡ Texify Pro</h2>
-    <div class="subtitle">Equation Syntax & Data Formatter</div>
-    
-    <label>Source Content (Rich Text Input)</label>
-    <textarea id="inputBox" placeholder="যেমন: ((√(-2))^^(10) (⟦x⟧_1+x_23)^(10)) g"></textarea>
-    
-    <div class="button-group">
-        <button class="btn btn-primary" onclick="convertToLatex()">⚙️ Convert to LaTeX</button>
-        <button class="btn btn-danger" onclick="clearAll()">🗑️ Clear All</button>
+    <div class="branding">
+        <h2>⚡ Texify Pro</h2>
+        <p>Smart Content Automation Studio</p>
     </div>
     
-    <label>Generated Syntax (CMS Ready)</label>
+    <label>SOURCE CONTENT (Rich Text Input)</label>
+    <textarea id="inputBox" placeholder="Paste content from Word/Mathpix here..."></textarea>
+    
+    <div class="btn-group">
+        <button class="btn btn-primary" onclick="convertToLatex()">⚙️ Run Processor</button>
+        <button class="btn btn-danger" onclick="clearAll()">🗑️ Reset</button>
+    </div>
+    
+    <label>GENERATED SYNTAX (CMS READY)</label>
     <textarea id="outputBox" readonly></textarea>
     
     <div class="action-group">
-        <button class="btn btn-warning" onclick="enableEdit()">✏️ Edit</button>
-        <button class="btn btn-info" onclick="previewLatex()">👁️ Preview</button>
-        <button class="btn copy-btn" id="copyBtn" onclick="copyResult()">📋 Copy LaTeX</button>
+        <button class="btn btn-warning btn" onclick="enableEdit()">✏️ Edit</button>
+        <button class="btn btn-info btn" onclick="previewLatex()">👁️ Preview</button>
+        <button class="btn copy-btn" id="copyBtn" onclick="copyResult()">📋 Copy Output</button>
     </div>
 
     <div id="previewContainer">
-        <div class="preview-title">🔴 Live Render Preview</div>
+        <div class="preview-header">🔴 Live Syntax Rendering</div>
         <div id="previewContent"></div>
     </div>
 </div>
 
 <script>
     function convertToLatex() {
-        let fullText = document.getElementById('inputBox').value;
-        let str = fullText;
+        let str = document.getElementById('inputBox').value;
 
-        let outBox = document.getElementById('outputBox');
-        outBox.setAttribute('readonly', true);
-        outBox.style.backgroundColor = "#f8fafc";
-        outBox.style.border = "1px solid #e2e8f0";
+        // ০. ক্লিনিং ও ইউনিকোড সিম্বল ফিক্স
+        str = str.replace(/⟦/g, '\\llbracket ').replace(/⟧/g, '\\rrbracket ').replace(/\^\^/g, '^');
 
-        // ১. MS Word এর লুকানো ব্র্যাকেট ও বিশেষ ব্র্যাকেট ফিক্স
-        str = str.replace(/⟦/g, '\\llbracket ');
-        str = str.replace(/⟧/g, '\\rrbracket ');
+        // ১. গ্রীক সিম্বল ও ফিজিক্স স্পেশাল (Nu-bar Fix)
+        // তরঙ্গ সংখ্যা ν̅ এর জন্য স্পেশাল লজিক
+        str = str.replace(/ν̅|ν\u0305/g, '\\bar{\\nu} '); 
+        str = str.replace(/ν/g, '\\nu ');
+        str = str.replace(/λ/g, '\\lambda ');
 
-        // ২. ডাবল কেয়ারকা (Double Caret) ক্লিনআপ
-        str = str.replace(/\^\^/g, '^');
+        // ২. সাবস্ক্রিপ্ট ও পাওয়ার
+        str = str.replace(/_([a-zA-Z0-9]+)/g, '_{$1}').replace(/\^\(([^)]+)\)/g, '^{$1}').replace(/\^([a-zA-Z0-9]+)/g, '^{$1}');
 
-        // ৩. সাবস্ক্রিপ্ট (Subscript) এবং পাওয়ার (Exponent) প্রসেসর
-        str = str.replace(/\^\(([^)]+)\)/g, '^{$1}'); 
-        str = str.replace(/\^([a-zA-Z0-9]+)/g, '^{$1}'); 
-        str = str.replace(/_([a-zA-Z0-9]+)/g, '_{$1}');
-
-        // ৪. ভগ্নাংশ (Fraction) প্রসেসর
+        // ৩. অ্যাডভান্সড ফ্র্যাকশন প্রসেসর
         function processFractions(text) {
-            function stripOuterBrackets(s) {
-                s = s.trim();
-                if (s.startsWith('(') && s.endsWith(')')) {
-                    let openCount = 0;
-                    for (let idx = 0; idx < s.length - 1; idx++) {
-                        if (s[idx] === '(') openCount++;
-                        if (s[idx] === ')') openCount--;
-                        if (openCount === 0) return s; 
-                    }
-                    if (openCount === 1 && s[s.length - 1] === ')') {
-                        return s.substring(1, s.length - 1);
-                    }
-                }
-                return s;
-            }
-
-            let i = 0;
-            let limit = 500; 
+            let i = 0, limit = 500;
             while ((i = text.indexOf('/', i)) !== -1 && limit-- > 0) {
                 let leftStart = i - 1;
                 while (leftStart >= 0 && text[leftStart] === ' ') leftStart--;
-
                 let numStart = leftStart;
-
                 if (leftStart >= 0 && text[leftStart] === ')') {
-                    let keepScanning = true;
-                    while (keepScanning && numStart >= 0) {
-                        let tempStart = numStart;
-                        while (tempStart >= 0 && text[tempStart] === ' ') tempStart--;
-                        if (tempStart >= 0 && text[tempStart] === ')') {
-                            let closeCount = 1;
-                            tempStart--;
-                            while (tempStart >= 0 && closeCount > 0) {
-                                if (text[tempStart] === ')') closeCount++;
-                                if (text[tempStart] === '(') closeCount--;
-                                tempStart--;
-                            }
-                            numStart = tempStart; 
-                        } else {
-                            keepScanning = false;
-                        }
-                    }
-                    numStart++; 
-                } else {
-                    while (numStart >= 0 && /[a-zA-Z0-9πθβα∞Δ^{}\\\._√]/i.test(text[numStart])) { 
+                    let openCount = 1; numStart--;
+                    while (numStart >= 0 && openCount > 0) {
+                        if (text[numStart] === ')') openCount++;
+                        if (text[numStart] === '(') openCount--;
                         numStart--;
                     }
                     numStart++;
+                } else {
+                    while (numStart >= 0 && /[a-zA-Z0-9πθβα∞Δ^{}\\\._√\nu\lambda]/i.test(text[numStart])) numStart--;
+                    numStart++;
                 }
-
-                let numerator = text.substring(numStart, leftStart + 1);
-
                 let rightStart = i + 1;
                 while (rightStart < text.length && text[rightStart] === ' ') rightStart++;
-
                 let denEnd = rightStart;
-
                 if (rightStart < text.length && text[rightStart] === '(') {
-                    let keepScanning = true;
-                    while (keepScanning && denEnd < text.length) {
-                        let tempEnd = denEnd;
-                        while (tempEnd < text.length && text[tempEnd] === ' ') tempEnd++;
-                        if (tempEnd < text.length && text[tempEnd] === '(') {
-                            let openCount = 1;
-                            tempEnd++;
-                            while (tempEnd < text.length && openCount > 0) {
-                                if (text[tempEnd] === '(') openCount++;
-                                if (text[tempEnd] === ')') openCount--;
-                                tempEnd++;
-                            }
-                            denEnd = tempEnd; 
-                        } else {
-                            keepScanning = false;
-                        }
-                    }
-                    denEnd--; 
-                } else {
-                    while (denEnd < text.length && /[a-zA-Z0-9πθβα∞Δ^{}\\\._√]/i.test(text[denEnd])) {
+                    let openCount = 1; denEnd++;
+                    while (denEnd < text.length && openCount > 0) {
+                        if (text[denEnd] === '(') openCount++;
+                        if (text[denEnd] === ')') openCount--;
                         denEnd++;
                     }
                     denEnd--;
-                }
-
-                let denominator = text.substring(rightStart, denEnd + 1);
-
-                if (numerator && denominator) {
-                    let cleanNum = stripOuterBrackets(numerator);
-                    let cleanDen = stripOuterBrackets(denominator);
-                    let replacement = "\\frac{" + cleanNum + "}{" + cleanDen + "}";
-                    text = text.substring(0, numStart) + replacement + text.substring(denEnd + 1);
-                    i = 0; 
                 } else {
-                    i++;
+                    while (denEnd < text.length && /[a-zA-Z0-9πθβα∞Δ^{}\\\._√\nu\lambda]/i.test(text[denEnd])) denEnd++;
+                    denEnd--;
                 }
+                let numerator = text.substring(numStart, leftStart + 1).replace(/^\((.*)\)$/, '$1');
+                let denominator = text.substring(rightStart, denEnd + 1).replace(/^\((.*)\)$/, '$1');
+                if (numerator && denominator) {
+                    let rep = "\\frac{" + numerator.trim() + "}{" + denominator.trim() + "}";
+                    text = text.substring(0, numStart) + rep + text.substring(denEnd + 1);
+                    i = 0;
+                } else i++;
             }
             return text;
         }
-
         str = processFractions(str);
 
-        // ৫. বেসিক সিম্বল ও সাইন 
-        str = str.replace(/≤/g, '\\leq ');
-        str = str.replace(/≥/g, '\\geq ');
-        str = str.replace(/\\Delta/gi, 'Δ');
-        str = str.replace(/∆/g, 'Δ');
-        str = str.replace(/\\rightleftharpoons/gi, '⇌');
-        str = str.replace(/\\leftrightharpoons/gi, '⇌');
-        str = str.replace(/∴/g, '\\therefore ');
-        str = str.replace(/∵/g, '\\because ');
-        str = str.replace(/±/g, '\\pm ');
+        // ৪. সিম্বলস
+        str = str.replace(/≤/g, '\\leq ').replace(/≥/g, '\\geq ').replace(/∴/g, '\\therefore ').replace(/±/g, '\\pm ');
+        str = str.replace(/π/g, '\\pi ').replace(/∞/g, '\\infty ').replace(/×/g, '\\times ').replace(/√/g, '\\sqrt');
 
-        str = str.replace(/α/g, '\\alpha ');
-        str = str.replace(/β/g, '\\beta ');
-        str = str.replace(/θ/g, '\\theta ');
-        str = str.replace(/π/g, '\\pi ');
-        str = str.replace(/∞/g, '\\infty ');
-        str = str.replace(/⋯/g, '\\cdots '); 
-        str = str.replace(/×/g, '\\times ');
-        str = str.replace(/÷/g, '\\div ');
-        str = str.replace(/\s+\.\s+/g, ' \\cdot ');
-
-        // ৬. রুট (Root) এবং স্মার্ট ব্র্যাকেট পার্সার
+        // ৫. রুট অটো-ব্র্যাকেট
         str = str.replace(/√/g, '\\sqrt');
-        let index = 0;
-        while ((index = str.indexOf('\\sqrt(', index)) !== -1) {
-            let openCount = 1;
-            let j = index + 6;
-            while (j < str.length && openCount > 0) {
-                if (str[j] === '(') openCount++;
-                if (str[j] === ')') openCount--;
-                j++;
+        let idx = 0;
+        while ((idx = str.indexOf('\\sqrt(', idx)) !== -1) {
+            let open = 1, j = idx + 6;
+            while (j < str.length && open > 0) {
+                if (str[j] === '(') open++; if (str[j] === ')') open--; j++;
             }
-            if (openCount === 0) {
-                str = str.substring(0, index + 5) + '{' + str.substring(index + 6, j - 1) + '}' + str.substring(j);
-            } else {
-                index += 6;
-            }
+            if (open === 0) str = str.substring(0, idx + 5) + '{' + str.substring(idx + 6, j - 1) + '}' + str.substring(j);
+            else idx += 6;
         }
 
-        // ৭. লাইন বাই লাইন প্রসেসিং এবং স্মার্ট স্প্লিটার
+        // ৬. স্মার্ট লাইন স্প্লিটার এবং গ্যাপ ফিক্স (High-Fidelity)
         let lines = str.split('\n');
         let resultLines = [];
-
-        for (let idx = 0; idx < lines.length; idx++) {
-            let line = lines[idx];
-            if (line.trim() === "") {
-                resultLines.push("");
-                continue;
-            }
-
-            // এই রেজেক্সটি contiguous বাংলা শব্দ, স্পেসিফিক প্রিক্স লেবেল (A., B., অতএবএখানে,), এবং ফাঁকা গ্যাপগুলোকে আলাদা রাখার জন্য \s{2,} অ্যাড করা হয়েছে
+        for (let line of lines) {
+            if (!line.trim()) { resultLines.push(""); continue; }
             let parts = line.split(/([\s,।;:]*(?:[\u0980-\u09FF]+[\s,।;:]*)+|\s{2,})/);
             let formattedLine = "";
-
-            for (let j = 0; j < parts.length; j++) {
-                let part = parts[j];
-                if (part === "") continue;
-
-                // যদি বাংলা টেক্সট হয় অথবা পুরোটাই হোয়াইটস্পেস (ফাঁকা গ্যাপ) হয়, তাহলে $ বসবে না
-                if (/[\u0980-\u09FF]/.test(part) || /^\s+$/.test(part)) {
-                    formattedLine += part;
-                } else {
-                    if (part.trim() !== "") {
-                        let match = part.match(/^(\s*)(.*?)(\s*)$/);
-                        if (match) {
-                            formattedLine += match[1] + "$" + match[2] + "$" + match[3];
-                        } else {
-                            formattedLine += "$" + part + "$";
-                        }
-                    } else {
-                        formattedLine += part; 
-                    }
-                }
+            for (let part of parts) {
+                if (!part) continue;
+                if (/[\u0980-\u09FF]/.test(part)) formattedLine += part;
+                else if (/^\s{2,}$/.test(part)) formattedLine += part; // গ্যাপগুলো অক্ষত রাখা
+                else formattedLine += (part.trim() ? "$" + part.trim() + "$" : part);
             }
             resultLines.push(formattedLine);
         }
-
-        outBox.value = resultLines.join('\n');
-        document.getElementById('previewContainer').style.display = "none";
+        document.getElementById('outputBox').value = resultLines.join('\n');
     }
 
-    function enableEdit() {
-        let outBox = document.getElementById('outputBox');
-        outBox.removeAttribute('readonly');
-        outBox.style.backgroundColor = "#ffffff";
-        outBox.style.border = "2px solid #3b82f6";
-        outBox.focus();
-    }
-
+    function enableEdit() { let b = document.getElementById('outputBox'); b.removeAttribute('readonly'); b.style.backgroundColor = "#fff"; b.focus(); }
+    
     function previewLatex() {
-        let outBoxText = document.getElementById('outputBox').value;
-        let previewContainer = document.getElementById('previewContainer');
-        let previewContent = document.getElementById('previewContent');
-
-        if (outBoxText.trim() === "") {
-            alert("⚠️ আগে Convert করুন বা বক্সে কিছু লিখুন!");
-            return;
-        }
-
-        let safeText = outBoxText.replace(/&/g, "&amp;")
-                                 .replace(/</g, "&lt;")
-                                 .replace(/>/g, "&gt;");
-
-        let htmlFormat = safeText.replace(/\n/g, '<br>');
-        previewContent.innerHTML = htmlFormat;
-        previewContainer.style.display = "block";
-
-        if (window.MathJax) {
-            MathJax.typesetPromise([previewContent]).catch(function (err) {
-                console.log(err.message);
-            });
-        } else {
-            previewContent.innerHTML = "<span style='color:red;'>⚠️ MathJax লোড হয়নি। আপনার ইন্টারনেট কানেকশন চেক করুন!</span>";
-        }
+        let t = document.getElementById('outputBox').value;
+        let c = document.getElementById('previewContent');
+        // HTML গ্যাপ বজায় রাখতে একাধিক স্পেসকে &nbsp; দিয়ে রিপ্লেস করা
+        let cleanText = t.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        let spacedText = cleanText.replace(/  +/g, function(match) {
+            return '&nbsp;'.repeat(match.length);
+        });
+        c.innerHTML = spacedText.replace(/\n/g, '<br>');
+        document.getElementById('previewContainer').style.display = "block";
+        MathJax.typesetPromise([c]);
     }
 
-    function clearAll() {
-        document.getElementById('inputBox').value = "";
-        let outBox = document.getElementById('outputBox');
-        outBox.value = "";
-        outBox.setAttribute('readonly', true);
-        outBox.style.backgroundColor = "#f8fafc";
-        outBox.style.border = "1px solid #e2e8f0";
-        
-        document.getElementById('previewContainer').style.display = "none";
-        document.getElementById('previewContent').innerHTML = "";
-        
-        let copyBtn = document.getElementById('copyBtn');
-        copyBtn.innerHTML = "📋 Copy LaTeX";
-        copyBtn.style.backgroundColor = "#10b981";
-        document.getElementById('inputBox').focus();
-    }
-
+    function clearAll() { location.reload(); }
     function copyResult() {
-        let copyText = document.getElementById("outputBox");
-        if(copyText.value === "") return;
-        copyText.select();
-        document.execCommand("copy");
-        
-        let btn = document.getElementById("copyBtn");
-        btn.innerHTML = "✅ Copied!";
-        btn.style.backgroundColor = "#059669";
-        setTimeout(() => { 
-            btn.innerHTML = "📋 Copy LaTeX"; 
-            btn.style.backgroundColor = "#10b981";
-        }, 2000);
+        let b = document.getElementById('outputBox'); b.select(); document.execCommand("copy");
+        let btn = document.getElementById('copyBtn'); btn.innerHTML = "✅ Copied!";
+        setTimeout(() => { btn.innerHTML = "📋 Copy Output"; }, 2000);
     }
 </script>
-
 </body>
 </html>
