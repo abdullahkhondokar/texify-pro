@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Texify Pro - Math to LaTeX Studio</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+    
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; padding: 20px; display: flex; justify-content: center; }
         .container { background-color: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 650px; }
@@ -29,8 +32,8 @@
         
         #outputBox { background-color: #f8fafc; color: #0f172a; font-weight: bold; border: 1px solid #e2e8f0; }
         
-        /* Preview Box Styling */
-        #previewContainer { display: none; margin-top: 20px; padding: 20px; background-color: #ffffff; border: 2px dashed #cbd5e1; border-radius: 8px; min-height: 50px; font-size: 16px; color: #1e293b; overflow-x: auto; line-height: 1.6; }
+        /* Preview Box Styling: Added white-space: pre-wrap to keep spaces intact */
+        #previewContainer { display: none; margin-top: 20px; padding: 20px; background-color: #ffffff; border: 2px dashed #cbd5e1; border-radius: 8px; min-height: 50px; font-size: 16px; color: #1e293b; overflow-x: auto; line-height: 1.6; white-space: pre-wrap; }
         .preview-title { font-size: 12px; color: #64748b; font-weight: 800; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 6px; }
     </style>
 
@@ -52,7 +55,7 @@
     <div class="subtitle">Offline Math ➔ LaTeX Studio</div>
     
     <label>Normal Text (Word থেকে কপি করে এখানে দিন):</label>
-    <textarea id="inputBox" placeholder="যেমন: -3≤2x<8 বা, 4/3 < x < 14/3"></textarea>
+    <textarea id="inputBox" placeholder="যেমন: A. 2.82 x 10^(-3) g        B. 3.82 x 10^(-23) g"></textarea>
     
     <div class="button-group">
         <button class="btn btn-primary" onclick="convertToLatex()">⚙️ Convert to LaTeX</button>
@@ -86,6 +89,9 @@
 
         str = str.replace(/⟦/g, '');
         str = str.replace(/⟧/g, '');
+
+        // সাবস্ক্রিপ্ট (Subscript) ফিক্স (_23 -> _{23})
+        str = str.replace(/_([a-zA-Z0-9]+)/g, '_{$1}');
 
         str = str.replace(/\^\(([^)]+)\)/g, '^{$1}'); 
         str = str.replace(/\^([a-zA-Z0-9]+)/g, '^{$1}'); 
@@ -208,6 +214,7 @@
         str = str.replace(/∞/g, '\\infty ');
         str = str.replace(/⋯/g, '\\cdots '); 
         str = str.replace(/×/g, '\\times ');
+        str = str.replace(/x10/g, '\\times 10'); // Fix for x10 rendering as text x
         str = str.replace(/÷/g, '\\div ');
         str = str.replace(/\s+\.\s+/g, ' \\cdot ');
 
@@ -238,14 +245,16 @@
                 continue;
             }
 
-            let parts = line.split(/([\s,।;:]*(?:[\u0980-\u09FF]+[\s,।;:]*)+)/);
+            // বড় স্পেস (gap) গুলোকে আলাদা রাখার জন্য \s{2,} অ্যাড করা হয়েছে
+            let parts = line.split(/([\s,।;:]*(?:[\u0980-\u09FF]+[\s,।;:]*)+|\s{2,})/);
             let formattedLine = "";
 
             for (let j = 0; j < parts.length; j++) {
                 let part = parts[j];
                 if (part === "") continue;
 
-                if (/[\u0980-\u09FF]/.test(part)) {
+                // যদি বাংলা টেক্সট হয় অথবা পুরোটাই হোয়াইটস্পেস (ফাঁকা গ্যাপ) হয়, তাহলে $ বসবে না
+                if (/[\u0980-\u09FF]/.test(part) || /^\s+$/.test(part)) {
                     formattedLine += part;
                 } else {
                     if (part.trim() !== "") {
@@ -275,7 +284,6 @@
         outBox.focus();
     }
 
-    // 🌟 প্রিভিউ ফিক্স: HTML ট্যাগ কনফ্লিক্ট এড়াতে < এবং > কে এস্কেপ করা হয়েছে 🌟
     function previewLatex() {
         let outBoxText = document.getElementById('outputBox').value;
         let previewContainer = document.getElementById('previewContainer');
@@ -286,12 +294,10 @@
             return;
         }
 
-        // ব্রাউজার যাতে < এবং > কে HTML ট্যাগ মনে না করে, তার জন্য এগুলোকে এনটিটিতে কনভার্ট করা
         let safeText = outBoxText.replace(/&/g, "&amp;")
                                  .replace(/</g, "&lt;")
                                  .replace(/>/g, "&gt;");
 
-        // লাইন ব্রেক ঠিক করা
         let htmlFormat = safeText.replace(/\n/g, '<br>');
         previewContent.innerHTML = htmlFormat;
         previewContainer.style.display = "block";
