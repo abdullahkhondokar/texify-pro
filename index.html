@@ -55,7 +55,7 @@
     <div class="subtitle">Offline Math ➔ LaTeX Studio</div>
     
     <label>Normal Text (Word থেকে কপি করে এখানে দিন):</label>
-    <textarea id="inputBox" placeholder="যেমন: A. 2.82 x 10^(-3) g        B. 3.82 x 10^(-23) g"></textarea>
+    <textarea id="inputBox" placeholder="যেমন: ((√(-2))^^(10) (⟦x⟧_1+x_23)^(10)) g"></textarea>
     
     <div class="button-group">
         <button class="btn btn-primary" onclick="convertToLatex()">⚙️ Convert to LaTeX</button>
@@ -87,15 +87,19 @@
         outBox.style.backgroundColor = "#f8fafc";
         outBox.style.border = "1px solid #e2e8f0";
 
-        str = str.replace(/⟦/g, '');
-        str = str.replace(/⟧/g, '');
+        // ১. MS Word এর লুকানো ব্র্যাকেট ও বিশেষ ব্র্যাকেট ফিক্স
+        str = str.replace(/⟦/g, '\\llbracket ');
+        str = str.replace(/⟧/g, '\\rrbracket ');
 
-        // সাবস্ক্রিপ্ট (Subscript) ফিক্স (_23 -> _{23})
-        str = str.replace(/_([a-zA-Z0-9]+)/g, '_{$1}');
+        // ২. ডাবল কেয়ারকা (Double Caret) ক্লিনআপ
+        str = str.replace(/\^\^/g, '^');
 
+        // ৩. সাবস্ক্রিপ্ট (Subscript) এবং পাওয়ার (Exponent) প্রসেসর
         str = str.replace(/\^\(([^)]+)\)/g, '^{$1}'); 
         str = str.replace(/\^([a-zA-Z0-9]+)/g, '^{$1}'); 
+        str = str.replace(/_([a-zA-Z0-9]+)/g, '_{$1}');
 
+        // ৪. ভগ্নাংশ (Fraction) প্রসেসর
         function processFractions(text) {
             function stripOuterBrackets(s) {
                 s = s.trim();
@@ -197,6 +201,7 @@
 
         str = processFractions(str);
 
+        // ৫. বেসিক সিম্বল ও সাইন 
         str = str.replace(/≤/g, '\\leq ');
         str = str.replace(/≥/g, '\\geq ');
         str = str.replace(/\\Delta/gi, 'Δ');
@@ -214,27 +219,28 @@
         str = str.replace(/∞/g, '\\infty ');
         str = str.replace(/⋯/g, '\\cdots '); 
         str = str.replace(/×/g, '\\times ');
-        str = str.replace(/x10/g, '\\times 10'); // Fix for x10 rendering as text x
         str = str.replace(/÷/g, '\\div ');
         str = str.replace(/\s+\.\s+/g, ' \\cdot ');
 
+        // ৬. রুট (Root) এবং স্মার্ট ব্র্যাকেট পার্সার
         str = str.replace(/√/g, '\\sqrt');
-        let i = 0;
-        while ((i = str.indexOf('\\sqrt(', i)) !== -1) {
+        let index = 0;
+        while ((index = str.indexOf('\\sqrt(', index)) !== -1) {
             let openCount = 1;
-            let j = i + 6;
+            let j = index + 6;
             while (j < str.length && openCount > 0) {
                 if (str[j] === '(') openCount++;
                 if (str[j] === ')') openCount--;
                 j++;
             }
             if (openCount === 0) {
-                str = str.substring(0, i + 5) + '{' + str.substring(i + 6, j - 1) + '}' + str.substring(j);
+                str = str.substring(0, index + 5) + '{' + str.substring(index + 6, j - 1) + '}' + str.substring(j);
             } else {
-                i += 6;
+                index += 6;
             }
         }
 
+        // ৭. লাইন বাই লাইন প্রসেসিং এবং স্মার্ট স্প্লিটার
         let lines = str.split('\n');
         let resultLines = [];
 
@@ -245,7 +251,7 @@
                 continue;
             }
 
-            // বড় স্পেস (gap) গুলোকে আলাদা রাখার জন্য \s{2,} অ্যাড করা হয়েছে
+            // এই রেজেক্সটি contiguous বাংলা শব্দ, স্পেসিফিক প্রিক্স লেবেল (A., B., অতএবএখানে,), এবং ফাঁকা গ্যাপগুলোকে আলাদা রাখার জন্য \s{2,} অ্যাড করা হয়েছে
             let parts = line.split(/([\s,।;:]*(?:[\u0980-\u09FF]+[\s,।;:]*)+|\s{2,})/);
             let formattedLine = "";
 
