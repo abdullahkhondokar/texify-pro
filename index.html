@@ -158,20 +158,42 @@
             else idx += 6;
         }
 
-        // ৬. স্মার্ট লাইন স্প্লিটার এবং গ্যাপ ফিক্স (High-Fidelity)
+        // ৬. স্মার্ট লাইন স্প্লিটার এবং গ্যাপ ফিক্স (High-Fidelity Auto Math Detection)
         let lines = str.split('\n');
         let resultLines = [];
+        
+        // এই Regex টি বাংলা শব্দ, সাধারণ ইংরেজি শব্দ (a, A, I এবং ২+ অক্ষরের শব্দ) ডিটেক্ট করবে।
+        // ম্যাথ ফাংশন বা কমান্ড (sin, cos, log, frac ইত্যাদি) সাধারণ টেক্সট হিসেবে ধরবে না।
+        let mathKeywords = "sin|cos|tan|cot|sec|csc|log|ln|dx|dy|dz|lim|frac|sqrt|bar|nu|lambda|pi|infty|llbracket|rrbracket|therefore|pm|leq|geq|times|left|right";
+        let textPattern = new RegExp("([\\s,।;:\\.]*(?:(?:[\\u0980-\\u09FF]+|(?<!\\\\)\\b(?!(?:" + mathKeywords + ")\\b)[a-zA-Z]{2,}\\b|(?<!\\\\)\\b[aAI]\\b)[\\s,।;:\\.]*)+|\\s{2,})");
+
         for (let line of lines) {
             if (!line.trim()) { resultLines.push(""); continue; }
-            let parts = line.split(/([\s,।;:]*(?:[\u0980-\u09FF]+[\s,।;:]*)+|\s{2,})/);
+            
+            // TextPattern দিয়ে লাইনটিকে ভাগ করা
+            let parts = line.split(textPattern);
             let formattedLine = "";
-            for (let part of parts) {
+            
+            for (let i = 0; i < parts.length; i++) {
+                let part = parts[i];
                 if (!part) continue;
-                if (/[\u0980-\u09FF]/.test(part)) formattedLine += part;
-                else if (/^\s{2,}$/.test(part)) formattedLine += part; // গ্যাপগুলো অক্ষত রাখা
-                else formattedLine += (part.trim() ? "$" + part.trim() + "$" : part);
+                
+                if (i % 2 === 0) {
+                    // জোড় ইনডেক্স মানে এটি Regex এ ম্যাচ করেনি (অর্থাৎ এটি Math/Equation)
+                    let trimmed = part.trim();
+                    if (trimmed) {
+                        // স্পেসগুলো অক্ষত রেখে শুধু Math অংশটুকুর চারপাশে $ বসানো
+                        formattedLine += part.replace(trimmed, "$" + trimmed + "$");
+                    } else {
+                        formattedLine += part;
+                    }
+                } else {
+                    // বিজোড় ইনডেক্স মানে এটি সাধারণ টেক্সট (বাংলা বা সাধারণ ইংরেজি শব্দ)
+                    formattedLine += part;
+                }
             }
-            resultLines.push(formattedLine);
+            // পাশাপাশি একাধিক স্পেস থাকলে ক্লিন করা
+            resultLines.push(formattedLine.replace(/\$ \$/g, ' '));
         }
         document.getElementById('outputBox').value = resultLines.join('\n');
     }
