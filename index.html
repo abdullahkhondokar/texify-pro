@@ -36,7 +36,6 @@
         
         #outputBox { background-color: #f8fafc; color: #1e293b; font-weight: bold; border: 1.5px solid #e2e8f0; }
         
-        /* Preview Box Fix: Keeps spaces and renders correctly */
         #previewContainer { display: none; margin-top: 25px; padding: 25px; background-color: #ffffff; border: 2px dashed #cbd5e1; border-radius: 12px; font-size: 18px; color: #0f172a; overflow-x: auto; line-height: 1.8; white-space: pre-wrap; }
         .preview-header { font-size: 11px; color: #94a3b8; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; }
     </style>
@@ -147,30 +146,19 @@
             else idx += 6;
         }
 
-        // Mathpix Standard Auto-Formatter
         let lines = str.split('\n');
         let resultLines = [];
         
-        // Mathpix এর ফিজিক্স/ম্যাথ কিওয়ার্ড, ফাংশন এবং ইউনিটগুলো (এগুলোকে সাধারণ টেক্সট ধরা হবে না)
         let mathKeywords = "sin|cos|tan|cot|sec|csc|log|ln|dx|dy|dz|lim|frac|sqrt|bar|nu|lambda|pi|infty|llbracket|rrbracket|therefore|pm|leq|geq|times|left|right|alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|mu|xi|rho|sigma|tau|phi|chi|psi|omega|ms|cm|mm|kg|Hz|Pa|atm|mol|rad|max|min|avg|mathrm|text|begin|end|tabular|hline";
-        
-        // যতিচিহ্ন: '?' এবং '!' কে যুক্ত করা হয়েছে
         let punct = "[\\s,।;:\\.\\?!'\"]*";
-        
-        // সাধারণ ইংরেজি শব্দ (Topic, Difficulty, Medium, Easy ইত্যাদি)। সিঙ্গল লেটার (x, y, m, s) কে স্কিপ করা হয়েছে।
         let engWord = "(?<![\\\\\\{_\\^\\/])\\b(?!(?:" + mathKeywords + ")\\b)[a-zA-Z]{2,}\\b(?![\\}_\\^])";
-        
-        // অপশন চেনার জন্য (A., B., C.)
         let optionMarker = "(?<![a-zA-Z])[A-Za-z]\\.";
 
-        // শুধু সাধারণ টেক্সট (বাংলা, ইংলিশ শব্দ বা অপশন) দিয়ে পুরো লাইনকে ভাগ করা
         let textPattern = new RegExp("(" + punct + "(?:(?:[\\u0980-\\u09FF]+|" + engWord + "|" + optionMarker + ")" + punct + ")+|\\s{2,})");
 
         for (let line of lines) {
             if (!line.trim()) { resultLines.push(""); continue; }
             
-            // যদি লাইনে আগে থেকেই $ থাকে (যেমন Mathpix সরাসরি দিলে), তাহলে আর নতুন করে $ বসানোর দরকার নেই।
-            // এতে ডাবল $$ এর সমস্যা তৈরি হবে না।
             if (line.includes('$')) {
                 resultLines.push(line);
                 continue;
@@ -184,20 +172,18 @@
                 if (!part) continue;
                 
                 if (i % 2 === 0) {
-                    // এটি ম্যাথ/সমীকরণ (যেহেতু এটি TextPattern এ পড়েনি)
                     let trimmed = part.trim();
                     if (trimmed) {
-                        // পুরো সমীকরণকে একসাথে $ এর ভেতর রাখা
                         formattedLine += part.replace(trimmed, "$" + trimmed + "$");
                     } else {
                         formattedLine += part;
                     }
                 } else {
-                    // এটি সাধারণ টেক্সট (বাংলা, অপশন বা Topic/Difficulty এর মতো শব্দ)
                     formattedLine += part;
                 }
             }
-            resultLines.push(formattedLine.replace(/\$ \$/g, ' '));
+            // UPDATE: \$\s*\$ ব্যবহার করা হয়েছে, যা পাশাপাশি থাকা ম্যাথ ব্লকগুলোকে স্পেসসহ বা স্পেস ছাড়াই জোড়া লাগিয়ে দেবে
+            resultLines.push(formattedLine.replace(/\$\s*\$/g, ' '));
         }
         document.getElementById('outputBox').value = resultLines.join('\n');
     }
