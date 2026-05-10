@@ -84,19 +84,10 @@
     function convertToLatex() {
         let str = document.getElementById('inputBox').value;
 
-        // ০. ক্লিনিং ও ইউনিকোড সিম্বল ফিক্স
         str = str.replace(/⟦/g, '\\llbracket ').replace(/⟧/g, '\\rrbracket ').replace(/\^\^/g, '^');
-
-        // ১. V-bar এবং Nu-bar স্পেশাল ফিক্স (Word Hidden Macron Characters)
-        str = str.replace(/v[\u0304\u0305]/g, '\\bar{v} ');
-        str = str.replace(/ν[\u0304\u0305]/g, '\\bar{\\nu} ');
-        str = str.replace(/ν/g, '\\nu ');
-        str = str.replace(/λ/g, '\\lambda ');
-
-        // ২. সাবস্ক্রিপ্ট ও পাওয়ার
+        str = str.replace(/v[\u0304\u0305]/g, '\\bar{v} ').replace(/ν[\u0304\u0305]/g, '\\bar{\\nu} ').replace(/ν/g, '\\nu ').replace(/λ/g, '\\lambda ');
         str = str.replace(/_([a-zA-Z0-9]+)/g, '_{$1}').replace(/\^\(([^)]+)\)/g, '^{$1}').replace(/\^([a-zA-Z0-9]+)/g, '^{$1}');
 
-        // ৩. অ্যাডভান্সড ফ্র্যাকশন প্রসেসর
         function processFractions(text) {
             let i = 0, limit = 500;
             while ((i = text.indexOf('/', i)) !== -1 && limit-- > 0) {
@@ -142,11 +133,9 @@
         }
         str = processFractions(str);
 
-        // ৪. সিম্বলস
         str = str.replace(/≤/g, '\\leq ').replace(/≥/g, '\\geq ').replace(/∴/g, '\\therefore ').replace(/±/g, '\\pm ');
         str = str.replace(/π/g, '\\pi ').replace(/∞/g, '\\infty ').replace(/×/g, '\\times ').replace(/√/g, '\\sqrt');
 
-        // ৫. রুট অটো-ব্র্যাকেট
         str = str.replace(/√/g, '\\sqrt');
         let idx = 0;
         while ((idx = str.indexOf('\\sqrt(', idx)) !== -1) {
@@ -158,19 +147,35 @@
             else idx += 6;
         }
 
-        // ৬. স্মার্ট লাইন স্প্লিটার এবং গ্যাপ ফিক্স (High-Fidelity Auto Math Detection)
+        // Mathpix Standard Auto-Formatter
         let lines = str.split('\n');
         let resultLines = [];
         
-        // এই Regex টি বাংলা শব্দ, সাধারণ ইংরেজি শব্দ (a, A, I এবং ২+ অক্ষরের শব্দ) ডিটেক্ট করবে।
-        // ম্যাথ ফাংশন বা কমান্ড (sin, cos, log, frac ইত্যাদি) সাধারণ টেক্সট হিসেবে ধরবে না।
-        let mathKeywords = "sin|cos|tan|cot|sec|csc|log|ln|dx|dy|dz|lim|frac|sqrt|bar|nu|lambda|pi|infty|llbracket|rrbracket|therefore|pm|leq|geq|times|left|right";
-        let textPattern = new RegExp("([\\s,।;:\\.]*(?:(?:[\\u0980-\\u09FF]+|(?<!\\\\)\\b(?!(?:" + mathKeywords + ")\\b)[a-zA-Z]{2,}\\b|(?<!\\\\)\\b[aAI]\\b)[\\s,।;:\\.]*)+|\\s{2,})");
+        // Mathpix এর ফিজিক্স/ম্যাথ কিওয়ার্ড, ফাংশন এবং ইউনিটগুলো (এগুলোকে সাধারণ টেক্সট ধরা হবে না)
+        let mathKeywords = "sin|cos|tan|cot|sec|csc|log|ln|dx|dy|dz|lim|frac|sqrt|bar|nu|lambda|pi|infty|llbracket|rrbracket|therefore|pm|leq|geq|times|left|right|alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|mu|xi|rho|sigma|tau|phi|chi|psi|omega|ms|cm|mm|kg|Hz|Pa|atm|mol|rad|max|min|avg|mathrm|text|begin|end|tabular|hline";
+        
+        // যতিচিহ্ন: '?' এবং '!' কে যুক্ত করা হয়েছে
+        let punct = "[\\s,।;:\\.\\?!'\"]*";
+        
+        // সাধারণ ইংরেজি শব্দ (Topic, Difficulty, Medium, Easy ইত্যাদি)। সিঙ্গল লেটার (x, y, m, s) কে স্কিপ করা হয়েছে।
+        let engWord = "(?<![\\\\\\{_\\^\\/])\\b(?!(?:" + mathKeywords + ")\\b)[a-zA-Z]{2,}\\b(?![\\}_\\^])";
+        
+        // অপশন চেনার জন্য (A., B., C.)
+        let optionMarker = "(?<![a-zA-Z])[A-Za-z]\\.";
+
+        // শুধু সাধারণ টেক্সট (বাংলা, ইংলিশ শব্দ বা অপশন) দিয়ে পুরো লাইনকে ভাগ করা
+        let textPattern = new RegExp("(" + punct + "(?:(?:[\\u0980-\\u09FF]+|" + engWord + "|" + optionMarker + ")" + punct + ")+|\\s{2,})");
 
         for (let line of lines) {
             if (!line.trim()) { resultLines.push(""); continue; }
             
-            // TextPattern দিয়ে লাইনটিকে ভাগ করা
+            // যদি লাইনে আগে থেকেই $ থাকে (যেমন Mathpix সরাসরি দিলে), তাহলে আর নতুন করে $ বসানোর দরকার নেই।
+            // এতে ডাবল $$ এর সমস্যা তৈরি হবে না।
+            if (line.includes('$')) {
+                resultLines.push(line);
+                continue;
+            }
+
             let parts = line.split(textPattern);
             let formattedLine = "";
             
@@ -179,20 +184,19 @@
                 if (!part) continue;
                 
                 if (i % 2 === 0) {
-                    // জোড় ইনডেক্স মানে এটি Regex এ ম্যাচ করেনি (অর্থাৎ এটি Math/Equation)
+                    // এটি ম্যাথ/সমীকরণ (যেহেতু এটি TextPattern এ পড়েনি)
                     let trimmed = part.trim();
                     if (trimmed) {
-                        // স্পেসগুলো অক্ষত রেখে শুধু Math অংশটুকুর চারপাশে $ বসানো
+                        // পুরো সমীকরণকে একসাথে $ এর ভেতর রাখা
                         formattedLine += part.replace(trimmed, "$" + trimmed + "$");
                     } else {
                         formattedLine += part;
                     }
                 } else {
-                    // বিজোড় ইনডেক্স মানে এটি সাধারণ টেক্সট (বাংলা বা সাধারণ ইংরেজি শব্দ)
+                    // এটি সাধারণ টেক্সট (বাংলা, অপশন বা Topic/Difficulty এর মতো শব্দ)
                     formattedLine += part;
                 }
             }
-            // পাশাপাশি একাধিক স্পেস থাকলে ক্লিন করা
             resultLines.push(formattedLine.replace(/\$ \$/g, ' '));
         }
         document.getElementById('outputBox').value = resultLines.join('\n');
@@ -209,7 +213,6 @@
             return;
         }
 
-        // HTML গ্যাপ বজায় রাখতে একাধিক স্পেসকে &nbsp; দিয়ে রিপ্লেস করা
         let cleanText = t.replace(/</g, "&lt;").replace(/>/g, "&gt;");
         let spacedText = cleanText.replace(/  +/g, function(match) {
             return '&nbsp;'.repeat(match.length);
